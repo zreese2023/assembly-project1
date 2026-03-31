@@ -39,6 +39,14 @@ Score PROC
 Score ENDP
 
 main PROC
-
+	call Randomize ; irvine32 procedure to generate a new seed for a random number generator
+	call DrawPCards ; get first 2 player cards
+	call DrawPCards
+	call DrawDCards ; get first 2 dealer cards
+	call DrawDCards
+	call PTurn ; player turn
+	call DTurn ; dealer turn
+	call ShowDCards ; show dealer cards using procedure
+	call Score ; determine if player or dealer won
 main ENDP
 END main
