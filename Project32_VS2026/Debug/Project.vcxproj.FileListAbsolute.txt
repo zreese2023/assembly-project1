@@ -1,0 +1,2 @@
+D:\AsmBook 8\irvine\examples\VS 2026 projects\Project32_VS2026\Debug\Project.exe
+C:\projects\assembly-project1\Project32_VS2026\Debug\Project.exe
