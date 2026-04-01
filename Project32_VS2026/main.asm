@@ -108,7 +108,25 @@ L1: ; loop to print players cards
 ShowPCards ENDP
 
 ShowDCards PROC
-; show dealer cards procedure
+	; show dealer cards procedure
+	mov edx, OFFSET dealerTurnMessage ; address of dealer turn msg into edx
+	call WriteString
+	call Crlf ; new line
+	mov ecx,dealerCount ; load player cards to ecx
+	mov esi,0 ; track index of array
+L1: ; loop to print dealer cards
+	mov eax,pCardArray[esi*4] ; dealer card array 
+	call WriteDec ; print card
+	call WriteChar
+	mov al,' ' ; print a space
+	call WriteChar
+	inc esi ; move to next index
+	loop L1
+
+	call Crlf ; new line
+	mov eax,dealerScore
+	call WriteString ; print dealer score
+	ret
 ShowDCards ENDP
 
 PTurn PROC
