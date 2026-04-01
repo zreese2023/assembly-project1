@@ -14,6 +14,10 @@ playerScore DWORD 0
 dealerCount DWORD 0
 dealerScore DWORD 0
 
+; track if player or dealer has an ace
+playerAce DWORD 0
+dealerAce DWORD 0
+
 ; string messages to help with output and gameplay
 playerTurnMessage BYTE "Your turn: ",0 ; player turn
 playerActionMSG BYTE "Hit or stand (h/s)?: ",0 ; player can hit or stand
@@ -59,26 +63,47 @@ DrawP PROC
 	; Player drawing cards procedure
 	call Draw ; get random card value
 	mov ecx,eax
-	mov ecx,eax
 	call Value ; get card value
-	add playerScore,eax ; add value to players score
-	mov ebx,playerCount
-	mov pCardArray[ebx*4],eax
-	inc playerCount ; increase the player count of cards
-	ret ; return
+	cmp eax,11 ; if ace drawn
+	jne noAce ; if not an ace jump
+	mov playerAce,1 ; otherwise set ace flag
+noAce: ; not an ace
+    add playerScore,eax ; add drawn card to score
+    cmp playerScore,21 ; check if 21
+    jle L1 ; if less than 21
+    cmp playerAce,1 ; if ace flag set
+    jne L1 ; jump if ace flag not set
+    sub playerScore,10 ; subtract 10 from player score (ace treated as 1 instead of 11 for score)
+    mov playerAce,0 ; reset ace flag
+L1:
+    mov ebx,playerCount ; index for player card array
+    mov pCardArray[ebx*4],eax ; put card into array
+    inc playerCount ; move to next index
+    ret
 DrawP ENDP
 
 DrawD PROC
 	; Draw dealer cards procedure, same logic as DrawP proc
 	call Draw ; get random number
-	mov ecx,eax
 	mov ecx,eax ; move ecx to eax for Value proc
 	call Value ; get card value
-	add dealerScore,eax ; add value to dealers score
-	mov ebx,dealerCount
-	mov dCardArray[ebx*4],eax
-	inc dealerCount ; increase count of dealer cards
-	ret ; return
+	cmp eax,11 ; if ace
+    jne noAce ; jump if not ace
+    mov dealerAce,1 ; set dealer ace flag if dealer gets an ace
+noAce: ; uses same logic as player drawing an ace but modifies dealer variables
+	   ; therefore refer to DrawP for documentation of logic.
+    add dealerScore,eax
+    cmp dealerScore,21
+    jle L1
+    cmp dealerAce,1
+    jne L1
+    sub dealerScore,10
+    mov dealerAce,0
+L1:
+    mov ebx,dealerCount
+    mov dCardArray[ebx*4],eax
+    inc dealerCount
+    ret
 DrawD ENDP
 
 ShowPCards PROC
