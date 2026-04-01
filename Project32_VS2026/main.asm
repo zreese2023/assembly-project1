@@ -1,23 +1,18 @@
-.386
-.model flat, stdcall
-.stack 4096
-ExitProcess PROTO, dwExitCode : DWORD
-
 INCLUDE irvine32.inc
 
 .data
+; cards for player and dealer
+; Note: usually in blackjack, the player
+; and the dealer will not have more than 5 cards each
+pCardArray DWORD 0,0,0,0,0
+dCardArray DWORD 0,0,0,0,0
+cardArray DWORD 13 DUP (1,2,3,4,5,6,7,8,9,10,10,10,10) ; card values
 
 ; player and dealer scores
 playerCount DWORD 0
 playerScore DWORD 0
 dealerCount DWORD 0
 dealerScore DWORD 0
-
-; cards for player and dealer
-; Note: usually in blackjack, the player
-; and the dealer will not have more than 5 cards each
-pCardArray DWORD 0,0,0,0,0
-dCardArray DWORD 0,0,0,0,0
 
 ; string messages to help with output and gameplay
 playerTurnMessage BYTE "Your turn: ",0 ; player turn
@@ -39,11 +34,28 @@ Draw PROC
 Draw ENDP
 
 Value PROC
-	; handle face cards and ace value
+	; get card value, input is placed in ecx (moved there in Draw proc)
+	mov eax,ecx ; get input from ecx from Draw proc
+	cmp eax,1 ; if ace card jump to ace label
+	je ace
+	cmp eax,11 ; if not a face card
+	jb standard
+	cmp eax,12 ; jump to faceCard label if greater or equal to 12
+	jge faceCard
+standard: ; regular card
+	mov eax,ecx ; move result to eax
+	ret ; return eax
+faceCard: ; face card
+	mov eax,10 ; move 10 (face card value) to eax
+	ret ; return eax
+ace: ; ace
+	mov eax,11 ; move 11 (will update ace logic later) to eax
+	ret ; return
 Value ENDP
 
 DrawP PROC
 ; Player drawing cards procedure
+	
 DrawP ENDP
 
 DrawD PROC
