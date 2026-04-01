@@ -58,11 +58,10 @@ Value ENDP
 DrawP PROC
 	; Player drawing cards procedure
 	call Draw ; get random card value
-	push eax ; push eax to save state
+	mov ecx,eax
 	mov ecx,eax
 	call Value ; get card value
 	add playerScore,eax ; add value to players score
-	pop eax ; pop eax to retrieve previous values
 	mov ebx,playerCount
 	mov pCardArray[ebx*4],eax
 	inc playerCount ; increase the player count of cards
@@ -72,11 +71,10 @@ DrawP ENDP
 DrawD PROC
 	; Draw dealer cards procedure, same logic as DrawP proc
 	call Draw ; get random number
-	push eax ; save eax
+	mov ecx,eax
 	mov ecx,eax ; move ecx to eax for Value proc
 	call Value ; get card value
 	add dealerScore,eax ; add value to dealers score
-	pop eax ; retrieve eax
 	mov ebx,dealerCount
 	mov dCardArray[ebx*4],eax
 	inc dealerCount ; increase count of dealer cards
@@ -92,7 +90,9 @@ ShowPCards PROC
 	mov esi,0
 L1: ; loop to print players cards
 	mov eax,pCardArray[esi*4] ; get player card into eax
+	push ecx
 	call WriteDec ; print playerc ard
+	pop ecx
 	mov al,' ' ; print a space
 	call WriteChar
 	inc esi ; move to next element in array
@@ -113,7 +113,9 @@ ShowDCards PROC
 	mov esi,0 ; track index of array
 L1: ; loop to print dealer cards
 	mov eax,dCardArray[esi*4] ; dealer card array 
+	push ecx
 	call WriteDec ; print card
+	pop ecx
 	mov al,' ' ; print a space
 	call WriteChar
 	inc esi ; move to next index
@@ -135,6 +137,7 @@ L1:
 	mov edx, OFFSET playerActionMSG ; prompt player to hit or stand
 	call WriteString ; print
 	call ReadChar ; use read char to block program until input received
+	call Crlf
 	cmp al,'h' ; hit
 	je hit
 	cmp al,'H'
@@ -181,6 +184,30 @@ DTurn ENDP
 
 Score PROC
 ; determine winner: player or dealer
+	mov eax,playerScore ; put player score into register
+	mov ebx,dealerScore ; dealer score in another register
+	cmp eax,ebx ; compare
+	jg win ; if player beats dealer
+	jl lose ; if player has less than dealer
+	je tie ; if tie game
+win: ; print win message and exit
+	mov edx,OFFSET winMessage
+	call WriteString
+	call Crlf
+	call ReadKey
+	exit
+lose: ; print loss message and exit
+	mov edx,OFFSET loseMessage
+	call WriteString
+	call Crlf
+	call ReadKey
+	exit
+tie: ; print tie message and exit
+	mov edx,OFFSET pushMessage
+	call WriteString
+	call Crlf
+	call ReadKey
+	exit
 Score ENDP
 
 main PROC
