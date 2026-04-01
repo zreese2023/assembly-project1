@@ -17,11 +17,12 @@ dealerScore DWORD 0
 ; track if player or dealer has an ace
 playerAce DWORD 0
 dealerAce DWORD 0
+aceMSG BYTE 'A',0
 
 ; string messages to help with output and gameplay
-playerTurnMessage BYTE "Your turn: ",0 ; player turn
+playerTurnMessage BYTE "Your hand: ",0 ; player turn
 playerActionMSG BYTE "Hit or stand (h/s)?: ",0 ; player can hit or stand
-dealerTurnMessage BYTE "Dealer's turn:",0 ; dealers turn
+dealerTurnMessage BYTE "Dealer's hand:",0 ; dealers turn
 winMessage BYTE "You win!",0 ; player wins
 loseMessage BYTE "Dealer wins :(",0 ; player loses, dealer wins
 pushMessage BYTE "Push (draw)",0 ; push (draw)
@@ -116,7 +117,16 @@ ShowPCards PROC
 L1: ; loop to print players cards
 	mov eax,pCardArray[esi*4] ; get player card into eax
 	push ecx
+	cmp eax,11
+	je ace
+	cmp eax,1
+	je ace
 	call WriteDec ; print playerc ard
+	jmp postPrint
+ace:
+	mov edx,OFFSET aceMSG
+	call WriteString
+postPrint:
 	pop ecx
 	mov al,' ' ; print a space
 	call WriteChar
@@ -139,7 +149,16 @@ ShowDCards PROC
 L1: ; loop to print dealer cards
 	mov eax,dCardArray[esi*4] ; dealer card array 
 	push ecx
+	cmp eax,11
+	je ace
+	cmp eax,1
+	je ace
 	call WriteDec ; print card
+	jmp postPrint
+ace:
+	mov edx,OFFSET aceMSG
+	call WriteString
+postPrint:
 	pop ecx
 	mov al,' ' ; print a space
 	call WriteChar
@@ -149,6 +168,7 @@ L1: ; loop to print dealer cards
 	call Crlf ; new line
 	mov eax,dealerScore
 	call WriteDec ; print dealer score
+	call Crlf
 	ret
 ShowDCards ENDP
 
@@ -180,6 +200,7 @@ hit: ; if player hits
 stand: ; proc ends if player stands, no more actions
 	ret
 bust: ; if player gets more than 21
+	call ShowDCards
 	mov edx,OFFSET loseMessage
 	call WriteString ; print loss message
 	call Crlf ; new line
