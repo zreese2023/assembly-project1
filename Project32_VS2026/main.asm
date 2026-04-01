@@ -43,9 +43,7 @@ Value PROC
 	cmp eax,11 ; if not a face card
 	jb standard
 	cmp eax,12 ; jump to faceCard label if greater or equal to 12
-	jb faceCard
-	cmp eax,13
-	jb faceCard
+	jge faceCard
 standard: ; regular card
 	mov eax,ecx ; move result to eax
 	ret ; return eax
@@ -95,7 +93,6 @@ ShowPCards PROC
 L1: ; loop to print players cards
 	mov eax,pCardArray[esi*4] ; get player card into eax
 	call WriteDec ; print playerc ard
-	call WriteChar
 	mov al,' ' ; print a space
 	call WriteChar
 	inc esi ; move to next element in array
@@ -103,7 +100,7 @@ L1: ; loop to print players cards
 
 	call Crlf ; new line
 	mov eax,playerScore ; print the current total
-	call WriteString
+	call WriteDec
 	ret ; return
 ShowPCards ENDP
 
@@ -115,9 +112,8 @@ ShowDCards PROC
 	mov ecx,dealerCount ; load player cards to ecx
 	mov esi,0 ; track index of array
 L1: ; loop to print dealer cards
-	mov eax,pCardArray[esi*4] ; dealer card array 
+	mov eax,dCardArray[esi*4] ; dealer card array 
 	call WriteDec ; print card
-	call WriteChar
 	mov al,' ' ; print a space
 	call WriteChar
 	inc esi ; move to next index
@@ -125,18 +121,45 @@ L1: ; loop to print dealer cards
 
 	call Crlf ; new line
 	mov eax,dealerScore
-	call WriteString ; print dealer score
+	call WriteDec ; print dealer score
 	ret
 ShowDCards ENDP
 
 PTurn PROC
-; main procedure for player turn
+	; main procedure for player turn
+L1:
+	call ShowPCards ; print player cards
+	call Crlf ; new line
+	mov edx, OFFSET playerActionMSG ; prompt player to hit or stand
+	call WriteString ; print
+	call ReadChar ; use read char to block program until input received
+	cmp al,'h' ; hit
+	je hit
+	cmp al,'H'
+	je hit
+	cmp al,'s' ; stand
+	je stand
+	cmp al,'S'
+	je stand
+	jmp L1
+hit: ; if player hits
+	call DrawP ; player draws card
+	cmp playerScore,21 ; if greater than 21 player loses
+	jg bust
+	jmp L1
+stand: ; proc ends if player stands, no more actions
+	ret
+bust: ; if player gets more than 21
+	mov edx,OFFSET loseMessage
+	call WriteString ; print loss message
+	call Crlf ; new line
+	call ReadKey
+	exit ; exit program
 PTurn ENDP
 
 DTurn PROC
 ; procedure for dealer turn
 ; dealer will stand on soft 17
-; for this case
 DTurn ENDP
 
 Score PROC
