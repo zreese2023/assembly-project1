@@ -28,6 +28,8 @@ Draw PROC
 	; get a random card procedure (1-13)
 	mov eax,13 ; 13 possible card values
 	call RandomRange ; irvine32 procedure, puts a random integer into eax from range 0 to eax-1
+	; NOTE: RandomRange was not taught in class, so i consulted the internet/AI for the documentation
+	; on how to get random numbers in MASM with the irvine library.
 	inc eax ; 0 isnt a possible value, so add 1 to eax so we have values 1-13
 	mov ecx,eax ; move result to ecx use in determining value (if ace or face card)
 	ret
@@ -41,7 +43,9 @@ Value PROC
 	cmp eax,11 ; if not a face card
 	jb standard
 	cmp eax,12 ; jump to faceCard label if greater or equal to 12
-	jge faceCard
+	jb faceCard
+	cmp eax,13
+	jb faceCard
 standard: ; regular card
 	mov eax,ecx ; move result to eax
 	ret ; return eax
@@ -61,11 +65,8 @@ DrawP PROC
 	call Value ; get card value
 	add playerScore,eax ; add value to players score
 	pop eax ; pop eax to retrieve previous values
-	lea ebx,pCardArray ; get address of array into ebx
-	mov eax,playerCount ; move count into eax
-	shl eax,2 ; multiply by 4 since array is DWORD
-	add ebx,eax ; add value to ebx
-	mov [ebx],eax ; move eax into ebx
+	mov ebx,playerCount
+	mov pCardArray[ebx*4],eax
 	inc playerCount ; increase the player count of cards
 	ret ; return
 DrawP ENDP
@@ -78,17 +79,32 @@ DrawD PROC
 	call Value ; get card value
 	add dealerScore,eax ; add value to dealers score
 	pop eax ; retrieve eax
-	lea ebx,dCardArray ; get address of dealer array
-	mov eax,dealerCount ; move dealer count to eax
-	shl eax,2 ; multiply by 4 for DWORD
-	add ebx,eax ; add value to ebx
-	mov [ebx],eax ; save to ebx
+	mov ebx,dealerCount
+	mov dCardArray[ebx*4],eax
 	inc dealerCount ; increase count of dealer cards
 	ret ; return
 DrawD ENDP
 
 ShowPCards PROC
-; show player cards procedure
+	; show player cards procedure
+	mov edx, OFFSET playerTurnMessage ; load players turn message address to edx for WriteString
+	call WriteString ; print players turn message
+	call Crlf ; new line
+	mov ecx,playerCount ; load number of player cards to ecx for loop
+	mov esi,0
+L1: ; loop to print players cards
+	mov eax,pCardArray[esi*4] ; get player card into eax
+	call WriteDec ; print playerc ard
+	call WriteChar
+	mov al,' ' ; print a space
+	call WriteChar
+	inc esi ; move to next element in array
+	loop L1 ; loop
+
+	call Crlf ; new line
+	mov eax,playerScore ; print the current total
+	call WriteString
+	ret ; return
 ShowPCards ENDP
 
 ShowDCards PROC
@@ -119,5 +135,6 @@ main PROC
 	call DTurn ; dealer turn
 	call ShowDCards ; show dealer cards using procedure
 	call Score ; determine if player or dealer won
+	INVOKE ExitProcess,0
 main ENDP
 END main
