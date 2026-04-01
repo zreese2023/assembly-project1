@@ -130,6 +130,8 @@ PTurn PROC
 L1:
 	call ShowPCards ; print player cards
 	call Crlf ; new line
+	call ShowDCards ; show dealers cards
+	call Crlf
 	mov edx, OFFSET playerActionMSG ; prompt player to hit or stand
 	call WriteString ; print
 	call ReadChar ; use read char to block program until input received
@@ -160,6 +162,21 @@ PTurn ENDP
 DTurn PROC
 ; procedure for dealer turn
 ; dealer will stand on soft 17
+L1: ; main loop
+	cmp dealerScore,17 ; stands on 17
+	jge stand
+	call DrawD ; if less than 17 dealer hits
+	jmp L1 ; loop
+stand:
+	cmp dealerScore,21 ; if dealer over 21, player wins
+	jg bust
+	ret
+bust: ; dealer over 21
+	mov edx,OFFSET winMessage ; print win message
+	call WriteString
+	call Crlf
+	call ReadKey
+	exit
 DTurn ENDP
 
 Score PROC
