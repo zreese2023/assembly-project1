@@ -54,8 +54,20 @@ ace: ; ace
 Value ENDP
 
 DrawP PROC
-; Player drawing cards procedure
-	
+	; Player drawing cards procedure
+	call Draw ; get random card value
+	push eax ; push eax to save state
+	mov ecx,eax
+	call Value ; get card value
+	add playerScore,eax ; add value to players score
+	pop eax ; pop eax to retrieve previous values
+	lea ebx, pCardArray ; get address of array into ebx
+	mov eax, playerCount ; move count into eax
+	shl eax, 2 ; multiply by 4 since array is DWORD
+	add ebx, eax ; add value to ebx
+	mov [ebx], eax ; move eax into ebx
+	inc playerCount ; increase the player count of cards
+	ret ; return
 DrawP ENDP
 
 DrawD PROC
