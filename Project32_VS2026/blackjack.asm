@@ -14,6 +14,9 @@ playerScore DWORD 0
 dealerCount DWORD 0
 dealerScore DWORD 0
 
+; hidden string, so you can only see dealers up card
+hidden BYTE ?,0
+
 ; track if player or dealer has an ace
 playerAce DWORD 0
 dealerAce DWORD 0
@@ -107,6 +110,33 @@ L1:
     ret
 DrawD ENDP
 
+ShowHiddenCard PROC
+	; only show dealers upcard and not both
+	mov edx,OFFSET dealerTurnMessage
+	call WriteString
+	call Crlf
+	mov eax,dCardArray[0] ; print first card as usual
+	push ecx
+	; same logic to check for an ace to print properly
+	cmp eax,11
+	je ace
+	cmp eax,1
+	je ace
+	call WriteDec
+	jmp postPrint
+ace: ; if card is ae
+	mov edx,OFFSET aceMSG
+	call WriteString
+postPrint:
+	pop ecx
+	mov al,' '
+	call WriteChar ; print a space
+	mov edx,OFFSET hidden ; dont print second dealer card for game purposes, print blank string
+	call WriteString
+	call Crlf ; new line
+	ret
+ShowHiddenCard ENDP
+
 ShowPCards PROC
 	; show player cards procedure
 	mov edx, OFFSET playerTurnMessage ; load players turn message address to edx for WriteString
@@ -178,7 +208,7 @@ L1:
 	call Clrscr
 	call ShowPCards ; print player cards
 	call Crlf ; new line
-	call ShowDCards ; show dealers cards
+	call ShowHiddenCard ; show dealers up card ONLY, not the second card
 	call Crlf
 	mov edx, OFFSET playerActionMSG ; prompt player to hit or stand
 	call WriteString ; print
