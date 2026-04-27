@@ -8,6 +8,10 @@ pCardArray DWORD 0,0,0,0,0
 dCardArray DWORD 0,0,0,0,0
 cardArray DWORD 13 DUP (1,2,3,4,5,6,7,8,9,10,10,10,10) ; card values
 
+; suits for player and dealer
+pSuitArray DWORD 0,0,0,0,0
+dSuitArray DWORD 0,0,0,0,0
+
 playerWallet DWORD 500 ; start with $500
 bet DWORD 0 ; this turns bet
 wallet BYTE "Your wallet: $",0
@@ -61,6 +65,17 @@ Draw PROC
 	mov ecx,eax ; move result to ecx use in determining value (if ace or face card)
 	ret
 Draw ENDP
+
+DrawSuit PROC
+	; gets a random suit for the card
+	; 0: spades
+	; 1: clubs
+	; 2: hearts
+	; 3: diamonds
+	mov eax,4
+	call RandomRange
+	ret
+DrawSuit ENDP
 
 ShowWallet PROC ; procedure to print the players total money
 	mov edx,OFFSET wallet
