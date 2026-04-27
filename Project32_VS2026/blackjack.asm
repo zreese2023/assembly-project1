@@ -29,6 +29,8 @@ dealerTurnMessage BYTE "Dealer's hand:",0 ; dealers turn
 winMessage BYTE "You win!",0 ; player wins
 loseMessage BYTE "Dealer wins :(",0 ; player loses, dealer wins
 pushMessage BYTE "Push (draw)",0 ; push (draw)
+playAgainMessage BYTE "Play again (y/n)?: ",0 ; message to prompt to play again
+invalidMessage BYTE "Invalid key: try again", 0 ; if player enters an invalid key
 
 .code
 
@@ -296,20 +298,44 @@ win: ; print win message and exit
 	call WriteString
 	call Crlf
 	call ReadKey
-	exit
+	ret
 lose: ; print loss message and exit
 	mov edx,OFFSET loseMessage
 	call WriteString
 	call Crlf
 	call ReadKey
-	exit
+	ret
 tie: ; print tie message and exit
 	mov edx,OFFSET pushMessage
 	call WriteString
 	call Crlf
 	call ReadKey
-	exit
 Score ENDP
+
+PromptPlayAgain PROC ; ask player to play again
+	call Crlf
+	mov edx, OFFSET playAgainMessage ; prompt player if they want to play again
+	call WriteString
+	call ReadChar
+	call Crlf
+	cmp al, 'y'
+	je yes ; if yes jump to play again
+	cmp al, 'Y'
+	je yes
+	cmp al, 'n'
+	je no ; if no jump to quit
+	cmp al, 'N'
+	je no
+	mov edx, OFFSET invalidMessage
+	call WriteString
+	jmp PromptPlayAGain
+yes: ; reset vars and start again
+	mov eax,1
+	ret
+no: ; player chooses to quit, exit program
+	mov eax,0
+    ret
+PromptPlayAgain ENDP
 
 main PROC
 	call Randomize ; irvine32 procedure to generate a new seed for a random number generator
@@ -322,6 +348,7 @@ main PROC
 	call Clrscr ; clear screen
 	call ShowDCards ; show dealer cards using procedure
 	call Score ; determine if player or dealer won
+
 	INVOKE ExitProcess,0
 main ENDP
 END main
