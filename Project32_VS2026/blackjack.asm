@@ -412,6 +412,38 @@ bust: ; dealer over 21
 	ret
 DTurn ENDP
 
+CheckBJ PROC
+	; check if player doesnt have blackjack and jump to correct label
+	cmp playerScore,21
+	jne NoPlayerBJ
+	cmp playerCount,2
+	jne NoPlayerBJ
+
+	; if player has blackjack, check dealer too for push
+	cmp dealerScore,21
+	jne NoDealerBJ
+	cmp dealerCount,2
+	jne NoDealerBJ
+
+	; if player and dealer have blackjack it is a push
+	call Clrscr
+	call ShowPCards
+	call Crlf
+	call ShowDCards
+	mov edx,OFFSET pushBJ
+	call WriteString
+	call Crlf
+	call ShowWallet
+	call Crlf
+	call ReadKey
+	mov eax,1
+	ret
+NoPlayerBJ:
+
+NoDealerBJ:
+
+CheckBJ ENDP
+
 Score PROC
 ; determine winner: player or dealer
 	mov eax,playerScore ; put player score into register
