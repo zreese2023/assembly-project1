@@ -1,4 +1,5 @@
 INCLUDE irvine32.inc
+SetConsoleOutputCP PROTO STDCALL, codePage:DWORD
 
 .data
 ; cards for player and dealer
@@ -166,6 +167,15 @@ ResetRound PROC ; procedure to reset the player and dealer arrays to 0 for a new
 	mov ecx,5
 	rep stosd
 
+	; reset suit arrays
+    mov edi,OFFSET pSuitArray
+    mov ecx,5
+    rep stosd
+ 
+    mov edi,OFFSET dSuitArray
+    mov ecx,5
+    rep stosd
+
 	mov playerCount,0 ; reset count vars
 	mov dealerCount,0
 	mov playerScore,0 ; reset score vars
@@ -243,11 +253,11 @@ PrintSuit PROC
 	push ecx
 	cmp ebx,2
 	jge RedSuit ; 2-3 are red suits, 0-1 are black (printed as white) suits
-	mov eax,white
+	mov eax,(black*16)+white
 	call SetTextColor
 	jmp Print
 RedSuit:
-	mov eax,red
+	mov eax,(black*16)+red
 	call SetTextColor
 Print:
 	cmp ebx,0
@@ -302,7 +312,6 @@ Suit:
 	mov al,' '
 	call WriteChar
 	pop ecx
-	pop eax
 	ret
 PrintCard ENDP
 
@@ -590,7 +599,7 @@ PromptPlayAgain PROC ; ask player to play again
 	je no
 	mov edx, OFFSET invalidMessage
 	call WriteString
-	jmp PromptPlayAGain
+	jmp PromptPlayAgain
 yes: ; reset vars and start again
 	mov eax,1
 	ret
@@ -600,7 +609,11 @@ no: ; player chooses to quit, exit program
 PromptPlayAgain ENDP
 
 main PROC
+	INVOKE SetConsoleOutputCP,437
 	call Randomize ; irvine32 procedure to generate a new seed for a random number generator
+	; the invoke above I taught myself with the internet outside of class
+	; the program wouldnt print the correct ASCII characters, so this sets the modes
+
 
 Start:
 	cmp playerWallet,0 ; ensure player has money
