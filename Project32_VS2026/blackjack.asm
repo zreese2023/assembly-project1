@@ -278,20 +278,31 @@ PrintSuit ENDP
 
 PrintCard PROC 
 	; procedure to do the ace logic instead of having it in both of the player and dealer print procs
+	; prints cards in the following format: [ (number) (suit) ] in the corresponding color
 	push ecx
+	push eax
+	mov al,'['
+	call WriteChar
+	pop eax
 	cmp eax,11
 	je Ace ; jump if ace
 	cmp eax,1
 	je Ace
 	call WriteDec
-	jmp post
+	jmp Suit
 Ace:
 	mov edx,OFFSET aceMSG
 	call WriteString
-post:
+Suit:
+	mov al,' '
+	call WriteChar
+	call PrintSuit
+	mov al,']'
+	call WriteChar
 	mov al,' '
 	call WriteChar
 	pop ecx
+	pop eax
 	ret
 PrintCard ENDP
 
@@ -301,6 +312,7 @@ ShowHiddenCard PROC
 	call WriteString
 	call Crlf
 	mov eax,dCardArray[0] ; print first card as usual
+	mov ebx,dSuitArray[0]
 	call PrintCard ; use new PrintCard proc to handle ace logic
 	mov edx,OFFSET hidden
 	call WriteString
@@ -317,6 +329,7 @@ ShowPCards PROC
 	mov esi,0
 L1: ; loop to print players cards
 	mov eax,pCardArray[esi*4] ; get player card into eax
+	mov ebx,pSuitArray[esi*4]
 	call PrintCard ; use PrintCard for ace logic
 	inc esi
 	Loop L1
@@ -356,7 +369,8 @@ ShowDCards PROC
 	mov ecx,dealerCount ; load player cards to ecx
 	mov esi,0 ; track index of array
 L1: ; loop to print dealer cards
-	mov eax,dCardArray[esi*4] ; dealer card array 
+	mov eax,dCardArray[esi*4] ; dealer card array
+	mov ebx,dSuitArray[esi*4]
 	Call PrintCard ; use new PrintCard procedure
 	inc esi
 	loop L1
