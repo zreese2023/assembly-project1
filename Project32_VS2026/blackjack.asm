@@ -242,7 +242,7 @@ PrintSuit PROC
 	push eax ; must preserve eax because card value will be in eax
 	push ecx
 	cmp ebx,2
-	jge RedSuit
+	jge RedSuit ; 2-3 are red suits, 0-1 are black (printed as white) suits
 	mov eax,white
 	call SetTextColor
 	jmp Print
@@ -250,8 +250,30 @@ RedSuit:
 	mov eax,red
 	call SetTextColor
 Print:
-	
-
+	cmp ebx,0
+	je Spade
+	cmp ebx,1
+	je Club
+	cmp ebx,2
+	je Heart
+	mov al,4 ; ASCII for diamond
+	jmp Write
+Spade:
+	mov al,6 ; ASCII for spades
+	jmp Write
+Club:
+	mov al,5 ; ASCII for clubs
+	jmp Write
+Heart:
+	mov al,3 ; ASCII for hearts
+	jmp Write
+Write:
+	call WriteChar
+	mov eax,white ; reset text color
+	call SetTextColor
+	pop ecx
+	pop eax
+	ret
 PrintSuit ENDP
 
 PrintCard PROC 
