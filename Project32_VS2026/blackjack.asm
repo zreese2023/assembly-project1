@@ -193,6 +193,8 @@ PrintCard PROC
 	push ecx
 	cmp eax,11
 	je Ace ; jump if ace
+	cmp eax,1
+	je ace
 	call WriteDec
 	jmp post
 Ace:
@@ -262,23 +264,9 @@ ShowDCards PROC
 	mov esi,0 ; track index of array
 L1: ; loop to print dealer cards
 	mov eax,dCardArray[esi*4] ; dealer card array 
-	push ecx
-	cmp eax,11
-	je ace
-	cmp eax,1
-	je ace
-	call WriteDec ; print card
-	jmp postPrint
-ace:
-	mov edx,OFFSET aceMSG
-	call WriteString
-postPrint:
-	pop ecx
-	mov al,' ' ; print a space
-	call WriteChar
-	inc esi ; move to next index
+	Call PrintCard ; use new PrintCard procedure
+	inc esi
 	loop L1
-
 	call Crlf ; new line
 	mov eax,dealerScore
 	call WriteDec ; print dealer score
