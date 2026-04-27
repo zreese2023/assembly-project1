@@ -8,6 +8,13 @@ pCardArray DWORD 0,0,0,0,0
 dCardArray DWORD 0,0,0,0,0
 cardArray DWORD 13 DUP (1,2,3,4,5,6,7,8,9,10,10,10,10) ; card values
 
+playerWallet DWORD 500 ; start with $500
+bet DWORD 0 ; this turns bet
+wallet BYTE "Your wallet: $",0
+betString BYTE "Your bet: $",0
+invalidBet BYTE "Bet must be between 0 and your max money",0
+outOfMoney BYTE "Out of money, you lose!",0
+
 ; player and dealer scores
 playerCount DWORD 0
 playerScore DWORD 0
@@ -45,6 +52,15 @@ Draw PROC
 	mov ecx,eax ; move result to ecx use in determining value (if ace or face card)
 	ret
 Draw ENDP
+
+ShowWallet PROC ; procedure to print the players total money
+	mov edx,OFFSET wallet
+	call WriteString
+	mov eax,playerWallet
+	call WriteDec
+	call Crlf
+	ret
+ShowWallet ENDP
 
 Value PROC
 	; get card value, input is placed in ecx (moved there in Draw proc)
