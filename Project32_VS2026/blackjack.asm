@@ -227,26 +227,29 @@ ShowPCards PROC
 	mov esi,0
 L1: ; loop to print players cards
 	mov eax,pCardArray[esi*4] ; get player card into eax
-	push ecx
-	cmp eax,11
-	je ace
-	cmp eax,1
-	je ace
-	call WriteDec ; print playerc ard
-	jmp postPrint
-ace:
-	mov edx,OFFSET aceMSG
-	call WriteString
-postPrint:
-	pop ecx
-	mov al,' ' ; print a space
-	call WriteChar
-	inc esi ; move to next element in array
-	loop L1 ; loop
-
+	call PrintCard ; use PrintCard for ace logic
+	inc esi
+	Loop L1
 	call Crlf ; new line
 	mov eax,playerScore ; print the current total
 	call WriteDec
+	call Crlf
+	; code to print the players wallet and their bet
+	mov edx,OFFSET wallet
+	call WriteString
+	mov eax,playerWallet
+	call WriteDec
+	mov al,' '
+	call WriteChar
+	mov al,'|'
+	call WriteChar
+	mov al,' '
+	call WriteChar
+	mov edx,OFFSET betPrint
+	call WriteString
+	mov eax,bet
+	call WriteDec
+	call Crlf
 	ret ; return
 ShowPCards ENDP
 
