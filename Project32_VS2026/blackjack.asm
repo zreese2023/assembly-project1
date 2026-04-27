@@ -86,6 +86,14 @@ invalid: ; prompt player to re type bet if invalid
 	jmp L1
 PlayerBet ENDP
 
+WinBet PROC ; pay player even money for winning a bet
+	; if the player wins they are paid 2:1 for their bet
+	mov eax,playerWallet
+	add eax,bet
+	mov playerWallet,eax
+	ret
+WinBet ENDP
+
 Value PROC
 	; get card value, input is placed in ecx (moved there in Draw proc)
 	mov eax,ecx ; get input from ecx from Draw proc
