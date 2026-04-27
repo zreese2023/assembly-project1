@@ -94,6 +94,13 @@ WinBet PROC ; pay player even money for winning a bet
 	ret
 WinBet ENDP
 
+LoseBet PROC ; if player loses the hand they lose whatever their wager was
+	mov eax,playerWallet
+	sub eax,bet
+	mov playerWallet,eax
+	ret
+LoseBet ENDP
+
 Value PROC
 	; get card value, input is placed in ecx (moved there in Draw proc)
 	mov eax,ecx ; get input from ecx from Draw proc
