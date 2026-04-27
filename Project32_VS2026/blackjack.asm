@@ -29,9 +29,14 @@ playerAce DWORD 0
 dealerAce DWORD 0
 aceMSG BYTE 'A',0
 
+doubleDown DWORD 0 ; double down flag
+doubleMessage BYTE " (doubled down)",0
+noDouble BYTE "Cannot double down",0
+
 ; string messages to help with output and gameplay
 playerTurnMessage BYTE "Your hand: ",0 ; player turn
 playerActionMSG BYTE "Hit or stand (h/s)?: ",0 ; player can hit or stand
+playerActionDouble BYTE "Hit, stand, or double down (h/s/d)?: ",0
 dealerTurnMessage BYTE "Dealer's hand:",0 ; dealers turn
 winMessage BYTE "You win!",0 ; player wins
 loseMessage BYTE "Dealer wins :(",0 ; player loses, dealer wins
@@ -137,6 +142,8 @@ ResetRound PROC ; procedure to reset the player and dealer arrays to 0 for a new
 	mov dealerScore,0
 	mov playerAce,0 ; zero ace flags
 	mov dealerAce,0
+	mov doubleDown,0
+	mov bet,0
 
 	ret
 ResetRound ENDP
@@ -251,6 +258,11 @@ L1: ; loop to print players cards
 	call WriteString
 	mov eax,bet
 	call WriteDec
+	cmp doubleDown,1
+	jne NoDoubleDown
+	mov edx,OFFSET doubleMessage
+	call WriteString
+NoDoubleDown:
 	call Crlf
 	ret ; return
 ShowPCards ENDP
@@ -282,10 +294,17 @@ L1:
 	call Crlf ; new line
 	call ShowHiddenCard ; show dealers up card ONLY, not the second card
 	call Crlf
-	mov edx, OFFSET playerActionMSG ; prompt player to hit or stand
-	call WriteString ; print
-	call ReadChar ; use read char to block program until input received
-	call Crlf
+	; see if player can double down
+	cmp playerCount,2
+	jne CantDouble
+	mov eax,bet
+	add eax,bet
+	cmp eax,playerWallet
+	jg CantDouble
+	mov edx,OFFSET playerActionDouble
+CantDouble: ; different prompt if player cant double down
+	mov edx,OFFSET playerActionMSG
+Prompt:
 	cmp al,'h' ; hit
 	je hit
 	cmp al,'H'
@@ -294,6 +313,10 @@ L1:
 	je stand
 	cmp al,'S'
 	je stand
+	cmp al,'d' ; double down
+	je tryDD
+	cmp al,'D'
+	je tryDD
 	jmp L1
 hit: ; if player hits
 	call DrawP ; player draws card
@@ -303,6 +326,8 @@ hit: ; if player hits
 stand: ; proc ends if player stands, no more actions
 	mov eax,0
 	ret
+tryDD: ; player tries to double down, check if they can
+	
 bust: ; if player gets more than 21
 	call LoseBet ; subtract money if player loses
 	call Clrscr
