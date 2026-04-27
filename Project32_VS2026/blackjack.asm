@@ -21,6 +21,10 @@ playerScore DWORD 0
 dealerCount DWORD 0
 dealerScore DWORD 0
 
+; blackjack messages
+playerBJ BYTE "Blackjack, you win!",0
+pushBJ BYTE "You and dealer have a blackjack, push!",0
+
 ; hidden string, so you can only see dealers up card
 hidden BYTE ?,0
 
@@ -105,6 +109,17 @@ LoseBet PROC ; if player loses the hand they lose whatever their wager was
 	mov playerWallet,eax
 	ret
 LoseBet ENDP
+
+BlackjackPay PROC
+	; special case for blackjack payout: player blackjack pays 3:2
+	mov eax,bet
+	mov ebx,3 ; multiply by 3
+	mul ebx
+	mov ebx,2 ; div by 2
+	div ebx
+	add playerWallet,eax
+	ret
+BlackjackPay ENDP
 
 Value PROC
 	; get card value, input is placed in ecx (moved there in Draw proc)
@@ -383,6 +398,8 @@ stand:
 bust: ; dealer over 21
 	call WinBet ; player wins wager on dealer bust
 	call Clrscr
+	call ShowPCards
+	call Crlf
 	call ShowDCards
 	call Crlf
 	mov edx,OFFSET winMessage ; print win message
