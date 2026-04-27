@@ -63,6 +63,26 @@ ace: ; ace
 	ret ; return
 Value ENDP
 
+ResetRound PROC ; procedure to reset the player and dealer arrays to 0 for a new round
+	mov edi, OFFSET pCardArray ; reset player cards
+	mov ecx,5
+	mov eax,0
+	rep stosd
+
+	mov edi, OFFSET dCardArray ; reset dealer cards
+	mov ecx,5
+	rep stosd
+
+	mov playerCount,0 ; reset count vars
+	mov dealerCount,0
+	mov playerScore,0 ; reset score vars
+	mov dealerScore,0
+	mov playerAce,0 ; zero ace flags
+	mov dealerAce,0
+
+	ret
+ResetRound ENDP
+
 DrawP PROC
 	; Player drawing cards procedure
 	call Draw ; get random card value
@@ -232,6 +252,8 @@ stand: ; proc ends if player stands, no more actions
 	ret
 bust: ; if player gets more than 21
 	call Clrscr
+	call ShowPCards
+	call Crlf
 	call ShowDCards
 	mov edx,OFFSET loseMessage
 	call WriteString ; print loss message
