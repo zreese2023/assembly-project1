@@ -188,30 +188,33 @@ L1:
     ret
 DrawD ENDP
 
+PrintCard PROC 
+	; procedure to do the ace logic instead of having it in both of the player and dealer print procs
+	push ecx
+	cmp eax,11
+	je Ace ; jump if ace
+	call WriteDec
+	jmp post
+Ace:
+	mov ecx,OFFSET aceMSG
+	call WriteString
+post:
+	mov al,' '
+	call WriteChar
+	pop ecx
+	ret
+PrintCard ENDP
+
 ShowHiddenCard PROC
 	; only show dealers upcard and not both
 	mov edx,OFFSET dealerTurnMessage
 	call WriteString
 	call Crlf
 	mov eax,dCardArray[0] ; print first card as usual
-	push ecx
-	; same logic to check for an ace to print properly
-	cmp eax,11
-	je ace
-	cmp eax,1
-	je ace
-	call WriteDec
-	jmp postPrint
-ace: ; if card is ae
-	mov edx,OFFSET aceMSG
+	call PrintCard ; use new PrintCard proc to handle ace logic
+	mov edx,OFFSET hidden
 	call WriteString
-postPrint:
-	pop ecx
-	mov al,' '
-	call WriteChar ; print a space
-	mov edx,OFFSET hidden ; dont print second dealer card for game purposes, print blank string
-	call WriteString
-	call Crlf ; new line
+	call Crlf
 	ret
 ShowHiddenCard ENDP
 
