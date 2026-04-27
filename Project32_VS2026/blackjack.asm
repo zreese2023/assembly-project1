@@ -438,10 +438,24 @@ CheckBJ PROC
 	call ReadKey
 	mov eax,1
 	ret
-NoPlayerBJ:
-
 NoDealerBJ:
-
+	call BlackjackPay
+	call Clrscr
+	call ShowPCards
+	call Crlf
+	call ShowDCards
+	call Crlf
+	mov edx,OFFSET playerBJ
+	call WriteString
+	call Crlf
+	call ShowWallet
+	call Crlf
+	call ReadKey
+	mov eax,1
+	ret
+NoPlayerBJ:
+	mov eax,0
+	ret
 CheckBJ ENDP
 
 Score PROC
@@ -525,6 +539,12 @@ HasMoney:
 	call DrawP
 	call DrawD ; get first 2 dealer cards
 	call DrawD
+
+	; check for blackjack
+	call CheckBJ
+	cmp eax,1
+	je Next
+
 	call PTurn ; player turn
 	cmp eax,1
 	je Next
@@ -532,6 +552,7 @@ HasMoney:
 	cmp eax,1
 	je Next
 	call Clrscr ; clear screen
+	call ShowPCards
 	call ShowDCards ; show dealer cards using procedure
 	call Score ; determine if player or dealer won
 
