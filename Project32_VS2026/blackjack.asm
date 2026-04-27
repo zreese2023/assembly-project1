@@ -233,6 +233,27 @@ L1:
     ret
 DrawD ENDP
 
+PrintSuit PROC
+	; prints the appropriate ASCII character for the corresponding suit
+	; 0=spade
+	; 1=club
+	; 2=hearts
+	; 3=diamonds
+	push eax ; must preserve eax because card value will be in eax
+	push ecx
+	cmp ebx,2
+	jge RedSuit
+	mov eax,white
+	call SetTextColor
+	jmp Print
+RedSuit:
+	mov eax,red
+	call SetTextColor
+Print:
+	
+
+PrintSuit ENDP
+
 PrintCard PROC 
 	; procedure to do the ace logic instead of having it in both of the player and dealer print procs
 	push ecx
