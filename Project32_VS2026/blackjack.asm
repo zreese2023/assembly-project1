@@ -197,6 +197,10 @@ noAce: ; not an ace
 L1:
     mov ebx,playerCount ; index for player card array
     mov pCardArray[ebx*4],eax ; put card into array
+	push ebx
+	call DrawSuit ; get the suit for the card into player suit array
+	pop ebx
+	mov pSuitArray[ebx*4],eax
     inc playerCount ; move to next index
     ret
 DrawP ENDP
@@ -221,6 +225,10 @@ noAce: ; uses same logic as player drawing an ace but modifies dealer variables
 L1:
     mov ebx,dealerCount
     mov dCardArray[ebx*4],eax
+	push ebx
+	call DrawSuit
+	pop ebx
+	mov dSuitArray[ebx*4],eax
     inc dealerCount
     ret
 DrawD ENDP
