@@ -302,9 +302,12 @@ L1:
 	cmp eax,playerWallet
 	jg CantDouble
 	mov edx,OFFSET playerActionDouble
+	jmp Prompt
 CantDouble: ; different prompt if player cant double down
 	mov edx,OFFSET playerActionMSG
 Prompt:
+	call WriteString
+	call ReadChar
 	cmp al,'h' ; hit
 	je hit
 	cmp al,'H'
@@ -327,7 +330,27 @@ stand: ; proc ends if player stands, no more actions
 	mov eax,0
 	ret
 tryDD: ; player tries to double down, check if they can
-	
+	cmp playerCount,2 ; ensure player has 2 cards
+	jne L1
+	mov eax,bet ; ensure player has enough money
+	add eax,bet
+	cmp eax,playerWallet
+	jg noDD
+	; double the wager
+	mov eax,bet
+	add bet,eax
+	mov doubleDown,1
+
+	call DrawP ; draw 1 more card and go from there
+	cmp playerScore,21
+	jg bust
+	mov eax,0
+	ret
+noDD:
+	mov edx,OFFSET noDouble
+	call WriteString
+	call Crlf
+	jmp L1
 bust: ; if player gets more than 21
 	call LoseBet ; subtract money if player loses
 	call Clrscr
