@@ -72,7 +72,7 @@ L1:
 
 	; check validity of bet, jump to invalid if invalid
 	cmp eax,0
-	jmp invalid
+	je invalid
 	cmp eax,playerWallet
 	jg invalid
 	mov bet,eax
@@ -194,11 +194,11 @@ PrintCard PROC
 	cmp eax,11
 	je Ace ; jump if ace
 	cmp eax,1
-	je ace
+	je Ace
 	call WriteDec
 	jmp post
 Ace:
-	mov ecx,OFFSET aceMSG
+	mov edx,OFFSET aceMSG
 	call WriteString
 post:
 	mov al,' '
@@ -335,6 +335,8 @@ stand:
 bust: ; dealer over 21
 	call WinBet ; player wins wager on dealer bust
 	call Clrscr
+	call ShowDCards
+	call Crlf
 	mov edx,OFFSET winMessage ; print win message
 	call WriteString
 	call Crlf
@@ -410,6 +412,18 @@ main PROC
 	call Randomize ; irvine32 procedure to generate a new seed for a random number generator
 
 Start:
+	cmp playerWallet,0 ; ensure player has money
+	jg HasMoney
+	call Clrscr
+	mov edx,OFFSET outOfMoney
+	call WriteString
+	call Crlf
+	call ReadKey
+	jmp quit
+
+HasMoney:
+	call Clrscr
+	call PlayerBet
 	call DrawP ; get first 2 player cards
 	call DrawP
 	call DrawD ; get first 2 dealer cards
