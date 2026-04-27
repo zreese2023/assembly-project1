@@ -11,8 +11,8 @@ cardArray DWORD 13 DUP (1,2,3,4,5,6,7,8,9,10,10,10,10) ; card values
 playerWallet DWORD 500 ; start with $500
 bet DWORD 0 ; this turns bet
 wallet BYTE "Your wallet: $",0
-betString BYTE "Your bet: $",0
-invalidBet BYTE "Bet must be between 0 and your max money",0
+betPrint BYTE "Your bet: $",0
+invalidBet BYTE "Try again, bet must be between 0 and your max money: $",0
 outOfMoney BYTE "Out of money, you lose!",0
 
 ; player and dealer scores
@@ -61,6 +61,30 @@ ShowWallet PROC ; procedure to print the players total money
 	call Crlf
 	ret
 ShowWallet ENDP
+
+PlayerBet PROC
+L1:
+	call ShowWallet ; print wallet
+	mov edx, OFFSET betPrint
+	call WriteString
+	call ReadDec ; get player bet
+	call Crlf
+
+	; check validity of bet, jump to invalid if invalid
+	cmp eax,0
+	jmp invalid
+	cmp eax,playerWallet
+	jg invalid
+	mov bet,eax
+	ret
+invalid: ; prompt player to re type bet if invalid
+	mov edx,OFFSET invalidBet
+	call WriteString
+	mov eax,playerWallet
+	call WriteDec
+	call Crlf
+	jmp L1
+PlayerBet ENDP
 
 Value PROC
 	; get card value, input is placed in ecx (moved there in Draw proc)
