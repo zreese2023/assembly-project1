@@ -304,6 +304,7 @@ stand: ; proc ends if player stands, no more actions
 	mov eax,0
 	ret
 bust: ; if player gets more than 21
+	call LoseBet ; subtract money if player loses
 	call Clrscr
 	call ShowPCards
 	call Crlf
@@ -311,6 +312,8 @@ bust: ; if player gets more than 21
 	mov edx,OFFSET loseMessage
 	call WriteString ; print loss message
 	call Crlf ; new line
+	call ShowWallet ; show players new amount of money
+	call Crlf
 	call ReadKey
 	mov eax,1
 	ret ; exit program
@@ -330,9 +333,12 @@ stand:
 	mov eax,0
 	ret
 bust: ; dealer over 21
+	call WinBet ; player wins wager on dealer bust
 	call Clrscr
 	mov edx,OFFSET winMessage ; print win message
 	call WriteString
+	call Crlf
+	call ShowWallet
 	call Crlf
 	call ReadKey
 	mov eax,1
@@ -348,14 +354,20 @@ Score PROC
 	jl lose ; if player has less than dealer
 	je tie ; if tie game
 win: ; print win message and exit
+	call WinBet
 	mov edx,OFFSET winMessage
 	call WriteString
+	call Crlf
+	call ShowWallet
 	call Crlf
 	call ReadKey
 	ret
 lose: ; print loss message and exit
+	call LoseBet
 	mov edx,OFFSET loseMessage
 	call WriteString
+	call Crlf
+	call ShowWallet
 	call Crlf
 	call ReadKey
 	ret
@@ -363,7 +375,10 @@ tie: ; print tie message and exit
 	mov edx,OFFSET pushMessage
 	call WriteString
 	call Crlf
+	call ShowWallet
+	call Crlf
 	call ReadKey
+	ret
 Score ENDP
 
 PromptPlayAgain PROC ; ask player to play again
