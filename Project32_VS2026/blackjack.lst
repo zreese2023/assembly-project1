@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.44.35223.0	    04/01/26 17:13:20
+Microsoft (R) Macro Assembler Version 14.44.35223.0	    04/27/26 20:17:14
 blackjack.asm						     Page 1 - 1
 
 
@@ -51,40 +51,129 @@ blackjack.asm						     Page 1 - 1
 	    0000000A
 	   ]
 
+				; suits for player and dealer
+ 000002CC 00000000		pSuitArray DWORD 0,0,0,0,0
+	   00000000
+	   00000000
+	   00000000
+	   00000000
+ 000002E0 00000000		dSuitArray DWORD 0,0,0,0,0
+	   00000000
+	   00000000
+	   00000000
+	   00000000
+
+				; suit words since ASCII characters dont work
+ 000002F4 53 70 61 64 65	suitSpade   BYTE "Spade",0
+	   00
+ 000002FA 43 6C 75 62 00	suitClub    BYTE "Club",0
+ 000002FF 48 65 61 72 74	suitHeart   BYTE "Heart",0
+	   00
+ 00000305 44 69 61 6D 6F	suitDiamond BYTE "Diamond",0
+	   6E 64 00
+
+ 0000030D 000001F4		playerWallet DWORD 500 ; start with $500
+ 00000311 00000000		bet DWORD 0 ; this turns bet
+ 00000315 59 6F 75 72 20	wallet BYTE "Your wallet: $",0
+	   77 61 6C 6C 65
+	   74 3A 20 24 00
+ 00000324 59 6F 75 72 20	betPrint BYTE "Your bet: $",0
+	   62 65 74 3A 20
+	   24 00
+ 00000330 54 72 79 20 61	invalidBet BYTE "Try again, bet must be between 0 and your max money: $",0
+	   67 61 69 6E 2C
+	   20 62 65 74 20
+	   6D 75 73 74 20
+	   62 65 20 62 65
+	   74 77 65 65 6E
+	   20 30 20 61 6E
+	   64 20 79 6F 75
+	   72 20 6D 61 78
+	   20 6D 6F 6E 65
+	   79 3A 20 24 00
+ 00000367 4F 75 74 20 6F	outOfMoney BYTE "Out of money, you lose!",0
+	   66 20 6D 6F 6E
+	   65 79 2C 20 79
+	   6F 75 20 6C 6F
+	   73 65 21 00
+
 				; player and dealer scores
- 000002CC 00000000		playerCount DWORD 0
- 000002D0 00000000		playerScore DWORD 0
- 000002D4 00000000		dealerCount DWORD 0
- 000002D8 00000000		dealerScore DWORD 0
+ 0000037F 00000000		playerCount DWORD 0
+ 00000383 00000000		playerScore DWORD 0
+ 00000387 00000000		dealerCount DWORD 0
+ 0000038B 00000000		dealerScore DWORD 0
+
+				; blackjack messages
+ 0000038F 42 6C 61 63 6B	playerBJ BYTE "Blackjack, you win!",0
+	   6A 61 63 6B 2C
+	   20 79 6F 75 20
+	   77 69 6E 21 00
+ 000003A3 59 6F 75 20 61	pushBJ BYTE "You and dealer have a blackjack, push!",0
+	   6E 64 20 64 65
+	   61 6C 65 72 20
+	   68 61 76 65 20
+	   61 20 62 6C 61
+	   63 6B 6A 61 63
+	   6B 2C 20 70 75
+	   73 68 21 00
 
 				; hidden string, so you can only see dealers up card
- 000002DC 00 00			hidden BYTE ?,0
+ 000003CA 00 00			hidden BYTE ?,0
 
 				; track if player or dealer has an ace
- 000002DE 00000000		playerAce DWORD 0
- 000002E2 00000000		dealerAce DWORD 0
- 000002E6 41 00			aceMSG BYTE 'A',0
+ 000003CC 00000000		playerAce DWORD 0
+ 000003D0 00000000		dealerAce DWORD 0
+ 000003D4 41 00			aceMSG BYTE 'A',0
+
+ 000003D6 00000000		doubleDown DWORD 0 ; double down flag
+ 000003DA 20 28 64 6F 75	doubleMessage BYTE " (doubled down)",0
+	   62 6C 65 64 20
+	   64 6F 77 6E 29
+	   00
+ 000003EA 43 61 6E 6E 6F	noDouble BYTE "Cannot double down",0
+	   74 20 64 6F 75
+	   62 6C 65 20 64
+	   6F 77 6E 00
 
 				; string messages to help with output and gameplay
- 000002E8 59 6F 75 72 20	playerTurnMessage BYTE "Your hand: ",0 ; player turn
+ 000003FD 59 6F 75 72 20	playerTurnMessage BYTE "Your hand: ",0 ; player turn
 	   68 61 6E 64 3A
 	   20 00
- 000002F4 48 69 74 20 6F	playerActionMSG BYTE "Hit or stand (h/s)?: ",0 ; player can hit or stand
+ 00000409 48 69 74 20 6F	playerActionMSG BYTE "Hit or stand (h/s)?: ",0 ; player can hit or stand
 	   72 20 73 74 61
 	   6E 64 20 28 68
 	   2F 73 29 3F 3A
 	   20 00
- 0000030A 44 65 61 6C 65	dealerTurnMessage BYTE "Dealer's hand:",0 ; dealers turn
+ 0000041F 48 69 74 2C 20	playerActionDouble BYTE "Hit, stand, or double down (h/s/d)?: ",0
+	   73 74 61 6E 64
+	   2C 20 6F 72 20
+	   64 6F 75 62 6C
+	   65 20 64 6F 77
+	   6E 20 28 68 2F
+	   73 2F 64 29 3F
+	   3A 20 00
+ 00000445 44 65 61 6C 65	dealerTurnMessage BYTE "Dealer's hand:",0 ; dealers turn
 	   72 27 73 20 68
 	   61 6E 64 3A 00
- 00000319 59 6F 75 20 77	winMessage BYTE "You win!",0 ; player wins
+ 00000454 59 6F 75 20 77	winMessage BYTE "You win!",0 ; player wins
 	   69 6E 21 00
- 00000322 44 65 61 6C 65	loseMessage BYTE "Dealer wins :(",0 ; player loses, dealer wins
+ 0000045D 44 65 61 6C 65	loseMessage BYTE "Dealer wins :(",0 ; player loses, dealer wins
 	   72 20 77 69 6E
 	   73 20 3A 28 00
- 00000331 50 75 73 68 20	pushMessage BYTE "Push (draw)",0 ; push (draw)
+ 0000046C 50 75 73 68 20	pushMessage BYTE "Push (draw)",0 ; push (draw)
 	   28 64 72 61 77
 	   29 00
+ 00000478 50 6C 61 79 20	playAgainMessage BYTE "Play again (y/n)?: ",0 ; message to prompt to play again
+	   61 67 61 69 6E
+	   20 28 79 2F 6E
+	   29 3F 3A 20 00
+ 0000048C 49 6E 76 61 6C	invalidMessage BYTE "Invalid key: try again", 0 ; if player enters an invalid key
+	   69 64 20 6B 65
+	   79 3A 20 74 72
+	   79 20 61 67 61
+	   69 6E 00
+ 000004A3 47 6F 6F 64 62	goodbye BYTE "Goodbye!", 0 ; exit game message
+	   79 65 21 00
 
  00000000			.code
 
@@ -99,296 +188,647 @@ blackjack.asm						     Page 1 - 1
  0000000D  C3				ret
  0000000E			Draw ENDP
 
- 0000000E			Value PROC
+ 0000000E			DrawSuit PROC
+					; gets a random suit for the card
+					; 0: spades
+					; 1: clubs
+					; 2: hearts
+					; 3: diamonds
+ 0000000E  B8 00000004			mov eax,4
+ 00000013  E8 00000000 E		call RandomRange
+ 00000018  C3				ret
+ 00000019			DrawSuit ENDP
+
+ 00000019			ShowWallet PROC ; procedure to print the players total money
+ 00000019  BA 00000315 R		mov edx,OFFSET wallet
+ 0000001E  E8 00000000 E		call WriteString
+ 00000023  A1 0000030D R		mov eax,playerWallet
+ 00000028  E8 00000000 E		call WriteDec
+ 0000002D  E8 00000000 E		call Crlf
+ 00000032  C3				ret
+ 00000033			ShowWallet ENDP
+
+ 00000033			PlayerBet PROC
+ 00000033			L1:
+ 00000033  E8 FFFFFFE1			call ShowWallet ; print wallet
+ 00000038  BA 00000324 R		mov edx, OFFSET betPrint
+ 0000003D  E8 00000000 E		call WriteString
+ 00000042  E8 00000000 E		call ReadDec ; get player bet
+ 00000047  E8 00000000 E		call Crlf
+
+					; check validity of bet, jump to invalid if invalid
+ 0000004C  83 F8 00			cmp eax,0
+ 0000004F  74 0E			je invalid
+ 00000051  3B 05 0000030D R		cmp eax,playerWallet
+ 00000057  7F 06			jg invalid
+ 00000059  A3 00000311 R		mov bet,eax
+ 0000005E  C3				ret
+ 0000005F			invalid: ; prompt player to re type bet if invalid
+ 0000005F  BA 00000330 R		mov edx,OFFSET invalidBet
+ 00000064  E8 00000000 E		call WriteString
+ 00000069  A1 0000030D R		mov eax,playerWallet
+ 0000006E  E8 00000000 E		call WriteDec
+ 00000073  E8 00000000 E		call Crlf
+ 00000078  EB B9			jmp L1
+ 0000007A			PlayerBet ENDP
+
+ 0000007A			WinBet PROC ; pay player even money for winning a bet
+					; if the player wins they are paid 2:1 for their bet
+ 0000007A  A1 0000030D R		mov eax,playerWallet
+ 0000007F  03 05 00000311 R		add eax,bet
+ 00000085  A3 0000030D R		mov playerWallet,eax
+ 0000008A  C3				ret
+ 0000008B			WinBet ENDP
+
+ 0000008B			LoseBet PROC ; if player loses the hand they lose whatever their wager was
+ 0000008B  A1 0000030D R		mov eax,playerWallet
+ 00000090  2B 05 00000311 R		sub eax,bet
+ 00000096  A3 0000030D R		mov playerWallet,eax
+ 0000009B  C3				ret
+ 0000009C			LoseBet ENDP
+
+ 0000009C			BlackjackPay PROC
+					; special case for blackjack payout: player blackjack pays 3:2
+ 0000009C  A1 00000311 R		mov eax,bet
+ 000000A1  BB 00000003			mov ebx,3 ; multiply by 3
+ 000000A6  F7 E3			mul ebx
+ 000000A8  BB 00000002			mov ebx,2 ; div by 2
+ 000000AD  F7 F3			div ebx
+ 000000AF  01 05 0000030D R		add playerWallet,eax
+ 000000B5  C3				ret
+ 000000B6			BlackjackPay ENDP
+
+ 000000B6			Value PROC
 					; get card value, input is placed in ecx (moved there in Draw proc)
- 0000000E  8B C1			mov eax,ecx ; get input from ecx from Draw proc
- 00000010  83 F8 01			cmp eax,1 ; if ace card jump to ace label
- 00000013  74 13			je ace
- 00000015  83 F8 0B			cmp eax,11 ; if not a face card
- 00000018  72 05			jb standard
- 0000001A  83 F8 0C			cmp eax,12 ; jump to faceCard label if greater or equal to 12
- 0000001D  7D 03			jge faceCard
- 0000001F			standard: ; regular card
- 0000001F  8B C1			mov eax,ecx ; move result to eax
- 00000021  C3				ret ; return eax
- 00000022			faceCard: ; face card
- 00000022  B8 0000000A			mov eax,10 ; move 10 (face card value) to eax
- 00000027  C3				ret ; return eax
- 00000028			ace: ; ace
- 00000028  B8 0000000B			mov eax,11 ; move 11 (will update ace logic later) to eax
- 0000002D  C3				ret ; return
- 0000002E			Value ENDP
+ 000000B6  8B C1			mov eax,ecx ; get input from ecx from Draw proc
+ 000000B8  83 F8 01			cmp eax,1 ; if ace card jump to ace label
+ 000000BB  74 13			je ace
+ 000000BD  83 F8 0B			cmp eax,11 ; if not a face card
+ 000000C0  72 05			jb standard
+ 000000C2  83 F8 0C			cmp eax,12 ; jump to faceCard label if greater or equal to 12
+ 000000C5  7D 03			jge faceCard
+ 000000C7			standard: ; regular card
+ 000000C7  8B C1			mov eax,ecx ; move result to eax
+ 000000C9  C3				ret ; return eax
+ 000000CA			faceCard: ; face card
+ 000000CA  B8 0000000A			mov eax,10 ; move 10 (face card value) to eax
+ 000000CF  C3				ret ; return eax
+ 000000D0			ace: ; ace
+ 000000D0  B8 0000000B			mov eax,11 ; move 11 (will update ace logic later) to eax
+ 000000D5  C3				ret ; return
+ 000000D6			Value ENDP
 
- 0000002E			DrawP PROC
+ 000000D6			ResetRound PROC ; procedure to reset the player and dealer arrays to 0 for a new round
+ 000000D6  BF 00000000 R		mov edi, OFFSET pCardArray ; reset player cards
+ 000000DB  B9 00000005			mov ecx,5
+ 000000E0  B8 00000000			mov eax,0
+ 000000E5  F3/ AB			rep stosd
+
+ 000000E7  BF 00000014 R		mov edi, OFFSET dCardArray ; reset dealer cards
+ 000000EC  B9 00000005			mov ecx,5
+ 000000F1  F3/ AB			rep stosd
+
+					; reset suit arrays
+ 000000F3  BF 000002CC R	    mov edi,OFFSET pSuitArray
+ 000000F8  B9 00000005		    mov ecx,5
+ 000000FD  F3/ AB		    rep stosd
+				 
+ 000000FF  BF 000002E0 R	    mov edi,OFFSET dSuitArray
+ 00000104  B9 00000005		    mov ecx,5
+ 00000109  F3/ AB		    rep stosd
+
+ 0000010B  C7 05 0000037F R		mov playerCount,0 ; reset count vars
+	   00000000
+ 00000115  C7 05 00000387 R		mov dealerCount,0
+	   00000000
+ 0000011F  C7 05 00000383 R		mov playerScore,0 ; reset score vars
+	   00000000
+ 00000129  C7 05 0000038B R		mov dealerScore,0
+	   00000000
+ 00000133  C7 05 000003CC R		mov playerAce,0 ; zero ace flags
+	   00000000
+ 0000013D  C7 05 000003D0 R		mov dealerAce,0
+	   00000000
+ 00000147  C7 05 000003D6 R		mov doubleDown,0
+	   00000000
+ 00000151  C7 05 00000311 R		mov bet,0
+	   00000000
+
+ 0000015B  C3				ret
+ 0000015C			ResetRound ENDP
+
+ 0000015C			DrawP PROC
 					; Player drawing cards procedure
- 0000002E  E8 FFFFFFCD			call Draw ; get random card value
- 00000033  8B C8			mov ecx,eax
- 00000035  E8 FFFFFFD4			call Value ; get card value
- 0000003A  83 F8 0B			cmp eax,11 ; if ace drawn
- 0000003D  75 0A			jne noAce ; if not an ace jump
- 0000003F  C7 05 000002DE R		mov playerAce,1 ; otherwise set ace flag
+ 0000015C  E8 FFFFFE9F			call Draw ; get random card value
+ 00000161  8B C8			mov ecx,eax
+ 00000163  E8 FFFFFF4E			call Value ; get card value
+ 00000168  83 F8 0B			cmp eax,11 ; if ace drawn
+ 0000016B  75 0A			jne noAce ; if not an ace jump
+ 0000016D  C7 05 000003CC R		mov playerAce,1 ; otherwise set ace flag
 	   00000001
- 00000049			noAce: ; not an ace
- 00000049  01 05 000002D0 R	    add playerScore,eax ; add drawn card to score
- 0000004F  83 3D 000002D0 R	    cmp playerScore,21 ; check if 21
+ 00000177			noAce: ; not an ace
+ 00000177  01 05 00000383 R	    add playerScore,eax ; add drawn card to score
+ 0000017D  83 3D 00000383 R	    cmp playerScore,21 ; check if 21
 	   15
- 00000056  7E 1A		    jle L1 ; if less than 21
- 00000058  83 3D 000002DE R	    cmp playerAce,1 ; if ace flag set
+ 00000184  7E 1A		    jle L1 ; if less than 21
+ 00000186  83 3D 000003CC R	    cmp playerAce,1 ; if ace flag set
 	   01
- 0000005F  75 11		    jne L1 ; jump if ace flag not set
- 00000061  83 2D 000002D0 R	    sub playerScore,10 ; subtract 10 from player score (ace treated as 1 instead of 11 for score)
+ 0000018D  75 11		    jne L1 ; jump if ace flag not set
+ 0000018F  83 2D 00000383 R	    sub playerScore,10 ; subtract 10 from player score (ace treated as 1 instead of 11 for score)
 	   0A
- 00000068  C7 05 000002DE R	    mov playerAce,0 ; reset ace flag
+ 00000196  C7 05 000003CC R	    mov playerAce,0 ; reset ace flag
 	   00000000
- 00000072			L1:
- 00000072  8B 1D 000002CC R	    mov ebx,playerCount ; index for player card array
- 00000078  89 04 9D		    mov pCardArray[ebx*4],eax ; put card into array
+ 000001A0			L1:
+ 000001A0  8B 1D 0000037F R	    mov ebx,playerCount ; index for player card array
+ 000001A6  89 04 9D		    mov pCardArray[ebx*4],eax ; put card into array
 	   00000000 R
- 0000007F  FF 05 000002CC R	    inc playerCount ; move to next index
- 00000085  C3			    ret
- 00000086			DrawP ENDP
+ 000001AD  53				push ebx
+ 000001AE  E8 FFFFFE5B			call DrawSuit ; get the suit for the card into player suit array
+ 000001B3  5B				pop ebx
+ 000001B4  89 04 9D			mov pSuitArray[ebx*4],eax
+	   000002CC R
+ 000001BB  FF 05 0000037F R	    inc playerCount ; move to next index
+ 000001C1  C3			    ret
+ 000001C2			DrawP ENDP
 
- 00000086			DrawD PROC
+ 000001C2			DrawD PROC
 					; Draw dealer cards procedure, same logic as DrawP proc
- 00000086  E8 FFFFFF75			call Draw ; get random number
- 0000008B  8B C8			mov ecx,eax ; move ecx to eax for Value proc
- 0000008D  E8 FFFFFF7C			call Value ; get card value
- 00000092  83 F8 0B			cmp eax,11 ; if ace
- 00000095  75 0A		    jne noAce ; jump if not ace
- 00000097  C7 05 000002E2 R	    mov dealerAce,1 ; set dealer ace flag if dealer gets an ace
+ 000001C2  E8 FFFFFE39			call Draw ; get random number
+ 000001C7  8B C8			mov ecx,eax ; move ecx to eax for Value proc
+ 000001C9  E8 FFFFFEE8			call Value ; get card value
+ 000001CE  83 F8 0B			cmp eax,11 ; if ace
+ 000001D1  75 0A		    jne noAce ; jump if not ace
+ 000001D3  C7 05 000003D0 R	    mov dealerAce,1 ; set dealer ace flag if dealer gets an ace
 	   00000001
- 000000A1			noAce: ; uses same logic as player drawing an ace but modifies dealer variables
+ 000001DD			noAce: ; uses same logic as player drawing an ace but modifies dealer variables
 					   ; therefore refer to DrawP for documentation of logic.
- 000000A1  01 05 000002D8 R	    add dealerScore,eax
- 000000A7  83 3D 000002D8 R	    cmp dealerScore,21
+ 000001DD  01 05 0000038B R	    add dealerScore,eax
+ 000001E3  83 3D 0000038B R	    cmp dealerScore,21
 	   15
- 000000AE  7E 1A		    jle L1
- 000000B0  83 3D 000002E2 R	    cmp dealerAce,1
+ 000001EA  7E 1A		    jle L1
+ 000001EC  83 3D 000003D0 R	    cmp dealerAce,1
 	   01
- 000000B7  75 11		    jne L1
- 000000B9  83 2D 000002D8 R	    sub dealerScore,10
+ 000001F3  75 11		    jne L1
+ 000001F5  83 2D 0000038B R	    sub dealerScore,10
 	   0A
- 000000C0  C7 05 000002E2 R	    mov dealerAce,0
+ 000001FC  C7 05 000003D0 R	    mov dealerAce,0
 	   00000000
- 000000CA			L1:
- 000000CA  8B 1D 000002D4 R	    mov ebx,dealerCount
- 000000D0  89 04 9D		    mov dCardArray[ebx*4],eax
+ 00000206			L1:
+ 00000206  8B 1D 00000387 R	    mov ebx,dealerCount
+ 0000020C  89 04 9D		    mov dCardArray[ebx*4],eax
 	   00000014 R
- 000000D7  FF 05 000002D4 R	    inc dealerCount
- 000000DD  C3			    ret
- 000000DE			DrawD ENDP
+ 00000213  53				push ebx
+ 00000214  E8 FFFFFDF5			call DrawSuit
+ 00000219  5B				pop ebx
+ 0000021A  89 04 9D			mov dSuitArray[ebx*4],eax
+	   000002E0 R
+ 00000221  FF 05 00000387 R	    inc dealerCount
+ 00000227  C3			    ret
+ 00000228			DrawD ENDP
 
- 000000DE			ShowHiddenCard PROC
+ 00000228			PrintSuit PROC
+					; prints the appropriate ASCII character for the corresponding suit
+					; 0=spade
+					; 1=club
+					; 2=hearts
+					; 3=diamonds
+ 00000228  50				push eax ; must preserve eax because card value will be in eax
+ 00000229  51				push ecx
+ 0000022A  53				push ebx
+ 0000022B  83 FB 02			cmp ebx,2
+ 0000022E  7D 0C			jge RedSuit ; 2-3 are red suits, 0-1 are black (printed as white) suits
+ 00000230  B8 0000000F			mov eax,(black*16)+white
+ 00000235  E8 00000000 E		call SetTextColor
+ 0000023A  EB 0A			jmp Print
+ 0000023C			RedSuit:
+ 0000023C  B8 00000004			mov eax,(black*16)+red
+ 00000241  E8 00000000 E		call SetTextColor
+ 00000246			Print:
+					;branching for suits to load suit into ebx
+ 00000246  83 FB 00			cmp ebx,0
+ 00000249  74 11			je Spade
+ 0000024B  83 FB 01			cmp ebx,1
+ 0000024E  74 13			je Club
+ 00000250  83 FB 02			cmp ebx,2
+ 00000253  74 15			je Heart
+ 00000255  BA 00000305 R		mov edx,OFFSET suitDiamond
+ 0000025A  EB 15			jmp Write
+ 0000025C			Spade:
+ 0000025C  BA 000002F4 R		mov edx,OFFSET suitSpade
+ 00000261  EB 0E			jmp Write
+ 00000263			Club:
+ 00000263  BA 000002FA R		mov edx,OFFSET suitClub
+ 00000268  EB 07			jmp Write
+ 0000026A			Heart:
+ 0000026A  BA 000002FF R		mov edx,OFFSET suitHeart
+ 0000026F  EB 00			jmp Write
+ 00000271			Write:
+ 00000271  E8 00000000 E		call WriteString
+ 00000276  B8 0000000F			mov eax,(black*16)+white ; reset text color
+ 0000027B  E8 00000000 E		call SetTextColor
+ 00000280  5B				pop ebx
+ 00000281  59				pop ecx
+ 00000282  58				pop eax
+ 00000283  C3				ret
+ 00000284			PrintSuit ENDP
+
+ 00000284			PrintCard PROC 
+					; procedure to do the ace logic instead of having it in both of the player and dealer print procs
+					; prints cards in the following format: [ (number) (suit) ] in the corresponding color
+ 00000284  51				push ecx
+ 00000285  50				push eax
+ 00000286  B0 5B			mov al,'['
+ 00000288  E8 00000000 E		call WriteChar
+ 0000028D  58				pop eax
+ 0000028E  83 F8 0B			cmp eax,11
+ 00000291  74 0C			je Ace ; jump if ace
+ 00000293  83 F8 01			cmp eax,1
+ 00000296  74 07			je Ace
+ 00000298  E8 00000000 E		call WriteDec
+ 0000029D  EB 0A			jmp Suit
+ 0000029F			Ace:
+ 0000029F  BA 000003D4 R		mov edx,OFFSET aceMSG
+ 000002A4  E8 00000000 E		call WriteString
+ 000002A9			Suit:
+ 000002A9  B0 20			mov al,' '
+ 000002AB  E8 00000000 E		call WriteChar
+ 000002B0  E8 FFFFFF73			call PrintSuit
+ 000002B5  B0 5D			mov al,']'
+ 000002B7  E8 00000000 E		call WriteChar
+ 000002BC  B0 20			mov al,' '
+ 000002BE  E8 00000000 E		call WriteChar
+ 000002C3  59				pop ecx
+ 000002C4  C3				ret
+ 000002C5			PrintCard ENDP
+
+ 000002C5			ShowHiddenCard PROC
 					; only show dealers upcard and not both
- 000000DE  BA 0000030A R		mov edx,OFFSET dealerTurnMessage
- 000000E3  E8 00000000 E		call WriteString
- 000000E8  E8 00000000 E		call Crlf
- 000000ED  A1 00000014 R		mov eax,dCardArray[0] ; print first card as usual
- 000000F2  51				push ecx
-					; same logic to check for an ace to print properly
- 000000F3  83 F8 0B			cmp eax,11
- 000000F6  74 0C			je ace
- 000000F8  83 F8 01			cmp eax,1
- 000000FB  74 07			je ace
- 000000FD  E8 00000000 E		call WriteDec
- 00000102  EB 0A			jmp postPrint
- 00000104			ace: ; if card is ae
- 00000104  BA 000002E6 R		mov edx,OFFSET aceMSG
- 00000109  E8 00000000 E		call WriteString
- 0000010E			postPrint:
- 0000010E  59				pop ecx
- 0000010F  B0 20			mov al,' '
- 00000111  E8 00000000 E		call WriteChar ; print a space
- 00000116  BA 000002DC R		mov edx,OFFSET hidden ; dont print second dealer card for game purposes, print blank string
- 0000011B  E8 00000000 E		call WriteString
- 00000120  E8 00000000 E		call Crlf ; new line
- 00000125  C3				ret
- 00000126			ShowHiddenCard ENDP
+ 000002C5  BA 00000445 R		mov edx,OFFSET dealerTurnMessage
+ 000002CA  E8 00000000 E		call WriteString
+ 000002CF  E8 00000000 E		call Crlf
+ 000002D4  A1 00000014 R		mov eax,dCardArray[0] ; print first card as usual
+ 000002D9  8B 1D 000002E0 R		mov ebx,dSuitArray[0]
+ 000002DF  E8 FFFFFFA0			call PrintCard ; use new PrintCard proc to handle ace logic
+ 000002E4  BA 000003CA R		mov edx,OFFSET hidden
+ 000002E9  E8 00000000 E		call WriteString
+ 000002EE  E8 00000000 E		call Crlf
+ 000002F3  C3				ret
+ 000002F4			ShowHiddenCard ENDP
 
- 00000126			ShowPCards PROC
+ 000002F4			ShowPCards PROC
 					; show player cards procedure
- 00000126  BA 000002E8 R		mov edx, OFFSET playerTurnMessage ; load players turn message address to edx for WriteString
- 0000012B  E8 00000000 E		call WriteString ; print players turn message
- 00000130  E8 00000000 E		call Crlf ; new line
- 00000135  8B 0D 000002CC R		mov ecx,playerCount ; load number of player cards to ecx for loop
- 0000013B  BE 00000000			mov esi,0
- 00000140			L1: ; loop to print players cards
- 00000140  8B 04 B5			mov eax,pCardArray[esi*4] ; get player card into eax
+ 000002F4  BA 000003FD R		mov edx, OFFSET playerTurnMessage ; load players turn message address to edx for WriteString
+ 000002F9  E8 00000000 E		call WriteString ; print players turn message
+ 000002FE  E8 00000000 E		call Crlf ; new line
+ 00000303  8B 0D 0000037F R		mov ecx,playerCount ; load number of player cards to ecx for loop
+ 00000309  BE 00000000			mov esi,0
+ 0000030E			L1: ; loop to print players cards
+ 0000030E  8B 04 B5			mov eax,pCardArray[esi*4] ; get player card into eax
 	   00000000 R
- 00000147  51				push ecx
- 00000148  83 F8 0B			cmp eax,11
- 0000014B  74 0C			je ace
- 0000014D  83 F8 01			cmp eax,1
- 00000150  74 07			je ace
- 00000152  E8 00000000 E		call WriteDec ; print playerc ard
- 00000157  EB 0A			jmp postPrint
- 00000159			ace:
- 00000159  BA 000002E6 R		mov edx,OFFSET aceMSG
- 0000015E  E8 00000000 E		call WriteString
- 00000163			postPrint:
- 00000163  59				pop ecx
- 00000164  B0 20			mov al,' ' ; print a space
- 00000166  E8 00000000 E		call WriteChar
- 0000016B  46				inc esi ; move to next element in array
- 0000016C  E2 D2			loop L1 ; loop
+ 00000315  8B 1C B5			mov ebx,pSuitArray[esi*4]
+	   000002CC R
+ 0000031C  E8 FFFFFF63			call PrintCard ; use PrintCard for ace logic
+ 00000321  46				inc esi
+ 00000322  E2 EA			Loop L1
+ 00000324  E8 00000000 E		call Crlf ; new line
+ 00000329  A1 00000383 R		mov eax,playerScore ; print the current total
+ 0000032E  E8 00000000 E		call WriteDec
+ 00000333  E8 00000000 E		call Crlf
+					; code to print the players wallet and their bet
+ 00000338  BA 00000315 R		mov edx,OFFSET wallet
+ 0000033D  E8 00000000 E		call WriteString
+ 00000342  A1 0000030D R		mov eax,playerWallet
+ 00000347  E8 00000000 E		call WriteDec
+ 0000034C  B0 20			mov al,' '
+ 0000034E  E8 00000000 E		call WriteChar
+ 00000353  B0 7C			mov al,'|'
+ 00000355  E8 00000000 E		call WriteChar
+ 0000035A  B0 20			mov al,' '
+ 0000035C  E8 00000000 E		call WriteChar
+ 00000361  BA 00000324 R		mov edx,OFFSET betPrint
+ 00000366  E8 00000000 E		call WriteString
+ 0000036B  A1 00000311 R		mov eax,bet
+ 00000370  E8 00000000 E		call WriteDec
+ 00000375  83 3D 000003D6 R		cmp doubleDown,1
+	   01
+ 0000037C  75 0A			jne NoDoubleDown
+ 0000037E  BA 000003DA R		mov edx,OFFSET doubleMessage
+ 00000383  E8 00000000 E		call WriteString
+ 00000388			NoDoubleDown:
+ 00000388  E8 00000000 E		call Crlf
+ 0000038D  C3				ret ; return
+ 0000038E			ShowPCards ENDP
 
- 0000016E  E8 00000000 E		call Crlf ; new line
- 00000173  A1 000002D0 R		mov eax,playerScore ; print the current total
- 00000178  E8 00000000 E		call WriteDec
- 0000017D  C3				ret ; return
- 0000017E			ShowPCards ENDP
-
- 0000017E			ShowDCards PROC
+ 0000038E			ShowDCards PROC
 					; show dealer cards procedure
- 0000017E  BA 0000030A R		mov edx, OFFSET dealerTurnMessage ; address of dealer turn msg into edx
- 00000183  E8 00000000 E		call WriteString
- 00000188  E8 00000000 E		call Crlf ; new line
- 0000018D  8B 0D 000002D4 R		mov ecx,dealerCount ; load player cards to ecx
- 00000193  BE 00000000			mov esi,0 ; track index of array
- 00000198			L1: ; loop to print dealer cards
- 00000198  8B 04 B5			mov eax,dCardArray[esi*4] ; dealer card array 
+ 0000038E  BA 00000445 R		mov edx, OFFSET dealerTurnMessage ; address of dealer turn msg into edx
+ 00000393  E8 00000000 E		call WriteString
+ 00000398  E8 00000000 E		call Crlf ; new line
+ 0000039D  8B 0D 00000387 R		mov ecx,dealerCount ; load player cards to ecx
+ 000003A3  BE 00000000			mov esi,0 ; track index of array
+ 000003A8			L1: ; loop to print dealer cards
+ 000003A8  8B 04 B5			mov eax,dCardArray[esi*4] ; dealer card array
 	   00000014 R
- 0000019F  51				push ecx
- 000001A0  83 F8 0B			cmp eax,11
- 000001A3  74 0C			je ace
- 000001A5  83 F8 01			cmp eax,1
- 000001A8  74 07			je ace
- 000001AA  E8 00000000 E		call WriteDec ; print card
- 000001AF  EB 0A			jmp postPrint
- 000001B1			ace:
- 000001B1  BA 000002E6 R		mov edx,OFFSET aceMSG
- 000001B6  E8 00000000 E		call WriteString
- 000001BB			postPrint:
- 000001BB  59				pop ecx
- 000001BC  B0 20			mov al,' ' ; print a space
- 000001BE  E8 00000000 E		call WriteChar
- 000001C3  46				inc esi ; move to next index
- 000001C4  E2 D2			loop L1
+ 000003AF  8B 1C B5			mov ebx,dSuitArray[esi*4]
+	   000002E0 R
+ 000003B6  E8 FFFFFEC9			Call PrintCard ; use new PrintCard procedure
+ 000003BB  46				inc esi
+ 000003BC  E2 EA			loop L1
+ 000003BE  E8 00000000 E		call Crlf ; new line
+ 000003C3  A1 0000038B R		mov eax,dealerScore
+ 000003C8  E8 00000000 E		call WriteDec ; print dealer score
+ 000003CD  E8 00000000 E		call Crlf
+ 000003D2  C3				ret
+ 000003D3			ShowDCards ENDP
 
- 000001C6  E8 00000000 E		call Crlf ; new line
- 000001CB  A1 000002D8 R		mov eax,dealerScore
- 000001D0  E8 00000000 E		call WriteDec ; print dealer score
- 000001D5  E8 00000000 E		call Crlf
- 000001DA  C3				ret
- 000001DB			ShowDCards ENDP
-
- 000001DB			PTurn PROC
+ 000003D3			PTurn PROC
 					; main procedure for player turn
- 000001DB			L1:
- 000001DB  E8 00000000 E		call Clrscr
- 000001E0  E8 FFFFFF41			call ShowPCards ; print player cards
- 000001E5  E8 00000000 E		call Crlf ; new line
- 000001EA  E8 FFFFFEEF			call ShowHiddenCard ; show dealers up card ONLY, not the second card
- 000001EF  E8 00000000 E		call Crlf
- 000001F4  BA 000002F4 R		mov edx, OFFSET playerActionMSG ; prompt player to hit or stand
- 000001F9  E8 00000000 E		call WriteString ; print
- 000001FE  E8 00000000 E		call ReadChar ; use read char to block program until input received
- 00000203  E8 00000000 E		call Crlf
- 00000208  3C 68			cmp al,'h' ; hit
- 0000020A  74 0E			je hit
- 0000020C  3C 48			cmp al,'H'
- 0000020E  74 0A			je hit
- 00000210  3C 73			cmp al,'s' ; stand
- 00000212  74 16			je stand
- 00000214  3C 53			cmp al,'S'
- 00000216  74 12			je stand
- 00000218  EB C1			jmp L1
- 0000021A			hit: ; if player hits
- 0000021A  E8 FFFFFE0F			call DrawP ; player draws card
- 0000021F  83 3D 000002D0 R		cmp playerScore,21 ; if greater than 21 player loses
+ 000003D3			L1:
+ 000003D3  E8 00000000 E		call Clrscr
+ 000003D8  E8 FFFFFF17			call ShowPCards ; print player cards
+ 000003DD  E8 00000000 E		call Crlf ; new line
+ 000003E2  E8 FFFFFEDE			call ShowHiddenCard ; show dealers up card ONLY, not the second card
+ 000003E7  E8 00000000 E		call Crlf
+					; see if player can double down
+ 000003EC  83 3D 0000037F R		cmp playerCount,2
+	   02
+ 000003F3  75 1A			jne CantDouble
+ 000003F5  A1 00000311 R		mov eax,bet
+ 000003FA  03 05 00000311 R		add eax,bet
+ 00000400  3B 05 0000030D R		cmp eax,playerWallet
+ 00000406  7F 07			jg CantDouble
+ 00000408  BA 0000041F R		mov edx,OFFSET playerActionDouble
+ 0000040D  EB 05			jmp Prompt
+ 0000040F			CantDouble: ; different prompt if player cant double down
+ 0000040F  BA 00000409 R		mov edx,OFFSET playerActionMSG
+ 00000414			Prompt:
+ 00000414  E8 00000000 E		call WriteString
+ 00000419  E8 00000000 E		call ReadChar
+ 0000041E  3C 68			cmp al,'h' ; hit
+ 00000420  74 16			je hit
+ 00000422  3C 48			cmp al,'H'
+ 00000424  74 12			je hit
+ 00000426  3C 73			cmp al,'s' ; stand
+ 00000428  74 1E			je stand
+ 0000042A  3C 53			cmp al,'S'
+ 0000042C  74 1A			je stand
+ 0000042E  3C 64			cmp al,'d' ; double down
+ 00000430  74 1C			je tryDD
+ 00000432  3C 44			cmp al,'D'
+ 00000434  74 18			je tryDD
+ 00000436  EB 9B			jmp L1
+ 00000438			hit: ; if player hits
+ 00000438  E8 FFFFFD1F			call DrawP ; player draws card
+ 0000043D  83 3D 00000383 R		cmp playerScore,21 ; if greater than 21 player loses
 	   15
- 00000226  7F 03			jg bust
- 00000228  EB B1			jmp L1
- 0000022A			stand: ; proc ends if player stands, no more actions
- 0000022A  C3				ret
- 0000022B			bust: ; if player gets more than 21
- 0000022B  E8 00000000 E		call Clrscr
- 00000230  E8 FFFFFF49			call ShowDCards
- 00000235  BA 00000322 R		mov edx,OFFSET loseMessage
- 0000023A  E8 00000000 E		call WriteString ; print loss message
- 0000023F  E8 00000000 E		call Crlf ; new line
- 00000244  E8 00000000 E		call ReadKey
-					exit ; exit program
- 00000249  6A 00	   *	    push   +000000000h
- 0000024B  E8 00000000 E   *	    call   ExitProcess
- 00000250			PTurn ENDP
+ 00000444  7F 65			jg bust
+ 00000446  EB 8B			jmp L1
+ 00000448			stand: ; proc ends if player stands, no more actions
+ 00000448  B8 00000000			mov eax,0
+ 0000044D  C3				ret
+ 0000044E			tryDD: ; player tries to double down, check if they can
+ 0000044E  83 3D 0000037F R		cmp playerCount,2 ; ensure player has 2 cards
+	   02
+ 00000455  0F 85 FFFFFF78		jne L1
+ 0000045B  A1 00000311 R		mov eax,bet ; ensure player has enough money
+ 00000460  03 05 00000311 R		add eax,bet
+ 00000466  3B 05 0000030D R		cmp eax,playerWallet
+ 0000046C  7F 29			jg noDD
+					; double the wager
+ 0000046E  A1 00000311 R		mov eax,bet
+ 00000473  01 05 00000311 R		add bet,eax
+ 00000479  C7 05 000003D6 R		mov doubleDown,1
+	   00000001
 
- 00000250			DTurn PROC
+ 00000483  E8 FFFFFCD4			call DrawP ; draw 1 more card and go from there
+ 00000488  83 3D 00000383 R		cmp playerScore,21
+	   15
+ 0000048F  7F 1A			jg bust
+ 00000491  B8 00000000			mov eax,0
+ 00000496  C3				ret
+ 00000497			noDD:
+ 00000497  BA 000003EA R		mov edx,OFFSET noDouble
+ 0000049C  E8 00000000 E		call WriteString
+ 000004A1  E8 00000000 E		call Crlf
+ 000004A6  E9 FFFFFF28			jmp L1
+ 000004AB			bust: ; if player gets more than 21
+ 000004AB  E8 FFFFFBDB			call LoseBet ; subtract money if player loses
+ 000004B0  E8 00000000 E		call Clrscr
+ 000004B5  E8 FFFFFE3A			call ShowPCards
+ 000004BA  E8 00000000 E		call Crlf
+ 000004BF  E8 FFFFFECA			call ShowDCards
+ 000004C4  BA 0000045D R		mov edx,OFFSET loseMessage
+ 000004C9  E8 00000000 E		call WriteString ; print loss message
+ 000004CE  E8 00000000 E		call Crlf ; new line
+ 000004D3  E8 FFFFFB41			call ShowWallet ; show players new amount of money
+ 000004D8  E8 00000000 E		call Crlf
+ 000004DD  E8 00000000 E		call ReadKey
+ 000004E2  B8 00000001			mov eax,1
+ 000004E7  C3				ret ; exit program
+ 000004E8			PTurn ENDP
+
+ 000004E8			DTurn PROC
 				; procedure for dealer turn
 				; dealer will stand on soft 17
- 00000250			L1: ; main loop
- 00000250  83 3D 000002D8 R		cmp dealerScore,17 ; stands on 17
+ 000004E8			L1: ; main loop
+ 000004E8  83 3D 0000038B R		cmp dealerScore,17 ; stands on 17
 	   11
- 00000257  7D 07			jge stand
- 00000259  E8 FFFFFE28			call DrawD ; if less than 17 dealer hits
- 0000025E  EB F0			jmp L1 ; loop
- 00000260			stand:
- 00000260  83 3D 000002D8 R		cmp dealerScore,21 ; if dealer over 21, player wins
+ 000004EF  7D 07			jge stand
+ 000004F1  E8 FFFFFCCC			call DrawD ; if less than 17 dealer hits
+ 000004F6  EB F0			jmp L1 ; loop
+ 000004F8			stand:
+ 000004F8  83 3D 0000038B R		cmp dealerScore,21 ; if dealer over 21, player wins
 	   15
- 00000267  7F 01			jg bust
- 00000269  C3				ret
- 0000026A			bust: ; dealer over 21
- 0000026A  E8 00000000 E		call Clrscr
- 0000026F  BA 00000319 R		mov edx,OFFSET winMessage ; print win message
- 00000274  E8 00000000 E		call WriteString
- 00000279  E8 00000000 E		call Crlf
- 0000027E  E8 00000000 E		call ReadKey
-					exit
- 00000283  6A 00	   *	    push   +000000000h
- 00000285  E8 00000000 E   *	    call   ExitProcess
- 0000028A			DTurn ENDP
+ 000004FF  7F 06			jg bust
+ 00000501  B8 00000000			mov eax,0
+ 00000506  C3				ret
+ 00000507			bust: ; dealer over 21
+ 00000507  E8 FFFFFB6E			call WinBet ; player wins wager on dealer bust
+ 0000050C  E8 00000000 E		call Clrscr
+ 00000511  E8 FFFFFDDE			call ShowPCards
+ 00000516  E8 00000000 E		call Crlf
+ 0000051B  E8 FFFFFE6E			call ShowDCards
+ 00000520  E8 00000000 E		call Crlf
+ 00000525  BA 00000454 R		mov edx,OFFSET winMessage ; print win message
+ 0000052A  E8 00000000 E		call WriteString
+ 0000052F  E8 00000000 E		call Crlf
+ 00000534  E8 FFFFFAE0			call ShowWallet
+ 00000539  E8 00000000 E		call Crlf
+ 0000053E  E8 00000000 E		call ReadKey
+ 00000543  B8 00000001			mov eax,1
+ 00000548  C3				ret
+ 00000549			DTurn ENDP
 
- 0000028A			Score PROC
+ 00000549			CheckBJ PROC
+					; check if player doesnt have blackjack and jump to correct label
+ 00000549  83 3D 00000383 R		cmp playerScore,21
+	   15
+ 00000550  0F 85 00000099		jne NoPlayerBJ
+ 00000556  83 3D 0000037F R		cmp playerCount,2
+	   02
+ 0000055D  0F 85 0000008C		jne NoPlayerBJ
+
+					; if player has blackjack, check dealer too for push
+ 00000563  83 3D 0000038B R		cmp dealerScore,21
+	   15
+ 0000056A  75 41			jne NoDealerBJ
+ 0000056C  83 3D 00000387 R		cmp dealerCount,2
+	   02
+ 00000573  75 38			jne NoDealerBJ
+
+					; if player and dealer have blackjack it is a push
+ 00000575  E8 00000000 E		call Clrscr
+ 0000057A  E8 FFFFFD75			call ShowPCards
+ 0000057F  E8 00000000 E		call Crlf
+ 00000584  E8 FFFFFE05			call ShowDCards
+ 00000589  BA 000003A3 R		mov edx,OFFSET pushBJ
+ 0000058E  E8 00000000 E		call WriteString
+ 00000593  E8 00000000 E		call Crlf
+ 00000598  E8 FFFFFA7C			call ShowWallet
+ 0000059D  E8 00000000 E		call Crlf
+ 000005A2  E8 00000000 E		call ReadKey
+ 000005A7  B8 00000001			mov eax,1
+ 000005AC  C3				ret
+ 000005AD			NoDealerBJ:
+ 000005AD  E8 FFFFFAEA			call BlackjackPay
+ 000005B2  E8 00000000 E		call Clrscr
+ 000005B7  E8 FFFFFD38			call ShowPCards
+ 000005BC  E8 00000000 E		call Crlf
+ 000005C1  E8 FFFFFDC8			call ShowDCards
+ 000005C6  E8 00000000 E		call Crlf
+ 000005CB  BA 0000038F R		mov edx,OFFSET playerBJ
+ 000005D0  E8 00000000 E		call WriteString
+ 000005D5  E8 00000000 E		call Crlf
+ 000005DA  E8 FFFFFA3A			call ShowWallet
+ 000005DF  E8 00000000 E		call Crlf
+ 000005E4  E8 00000000 E		call ReadKey
+ 000005E9  B8 00000001			mov eax,1
+ 000005EE  C3				ret
+ 000005EF			NoPlayerBJ:
+ 000005EF  B8 00000000			mov eax,0
+ 000005F4  C3				ret
+ 000005F5			CheckBJ ENDP
+
+ 000005F5			Score PROC
 				; determine winner: player or dealer
- 0000028A  A1 000002D0 R		mov eax,playerScore ; put player score into register
- 0000028F  8B 1D 000002D8 R		mov ebx,dealerScore ; dealer score in another register
- 00000295  3B C3			cmp eax,ebx ; compare
- 00000297  7F 04			jg win ; if player beats dealer
- 00000299  7C 1D			jl lose ; if player has less than dealer
- 0000029B  74 36			je tie ; if tie game
- 0000029D			win: ; print win message and exit
- 0000029D  BA 00000319 R		mov edx,OFFSET winMessage
- 000002A2  E8 00000000 E		call WriteString
- 000002A7  E8 00000000 E		call Crlf
- 000002AC  E8 00000000 E		call ReadKey
-					exit
- 000002B1  6A 00	   *	    push   +000000000h
- 000002B3  E8 00000000 E   *	    call   ExitProcess
- 000002B8			lose: ; print loss message and exit
- 000002B8  BA 00000322 R		mov edx,OFFSET loseMessage
- 000002BD  E8 00000000 E		call WriteString
- 000002C2  E8 00000000 E		call Crlf
- 000002C7  E8 00000000 E		call ReadKey
-					exit
- 000002CC  6A 00	   *	    push   +000000000h
- 000002CE  E8 00000000 E   *	    call   ExitProcess
- 000002D3			tie: ; print tie message and exit
- 000002D3  BA 00000331 R		mov edx,OFFSET pushMessage
- 000002D8  E8 00000000 E		call WriteString
- 000002DD  E8 00000000 E		call Crlf
- 000002E2  E8 00000000 E		call ReadKey
-					exit
- 000002E7  6A 00	   *	    push   +000000000h
- 000002E9  E8 00000000 E   *	    call   ExitProcess
- 000002EE			Score ENDP
+ 000005F5  A1 00000383 R		mov eax,playerScore ; put player score into register
+ 000005FA  8B 1D 0000038B R		mov ebx,dealerScore ; dealer score in another register
+ 00000600  3B C3			cmp eax,ebx ; compare
+ 00000602  7F 04			jg win ; if player beats dealer
+ 00000604  7C 26			jl lose ; if player has less than dealer
+ 00000606  74 48			je tie ; if tie game
+ 00000608			win: ; print win message and exit
+ 00000608  E8 FFFFFA6D			call WinBet
+ 0000060D  BA 00000454 R		mov edx,OFFSET winMessage
+ 00000612  E8 00000000 E		call WriteString
+ 00000617  E8 00000000 E		call Crlf
+ 0000061C  E8 FFFFF9F8			call ShowWallet
+ 00000621  E8 00000000 E		call Crlf
+ 00000626  E8 00000000 E		call ReadKey
+ 0000062B  C3				ret
+ 0000062C			lose: ; print loss message and exit
+ 0000062C  E8 FFFFFA5A			call LoseBet
+ 00000631  BA 0000045D R		mov edx,OFFSET loseMessage
+ 00000636  E8 00000000 E		call WriteString
+ 0000063B  E8 00000000 E		call Crlf
+ 00000640  E8 FFFFF9D4			call ShowWallet
+ 00000645  E8 00000000 E		call Crlf
+ 0000064A  E8 00000000 E		call ReadKey
+ 0000064F  C3				ret
+ 00000650			tie: ; print tie message and exit
+ 00000650  BA 0000046C R		mov edx,OFFSET pushMessage
+ 00000655  E8 00000000 E		call WriteString
+ 0000065A  E8 00000000 E		call Crlf
+ 0000065F  E8 FFFFF9B5			call ShowWallet
+ 00000664  E8 00000000 E		call Crlf
+ 00000669  E8 00000000 E		call ReadKey
+ 0000066E  C3				ret
+ 0000066F			Score ENDP
 
- 000002EE			main PROC
- 000002EE  E8 00000000 E		call Randomize ; irvine32 procedure to generate a new seed for a random number generator
- 000002F3  E8 FFFFFD36			call DrawP ; get first 2 player cards
- 000002F8  E8 FFFFFD31			call DrawP
- 000002FD  E8 FFFFFD84			call DrawD ; get first 2 dealer cards
- 00000302  E8 FFFFFD7F			call DrawD
- 00000307  E8 FFFFFECF			call PTurn ; player turn
- 0000030C  E8 FFFFFF3F			call DTurn ; dealer turn
- 00000311  E8 00000000 E		call Clrscr ; clear screen
- 00000316  E8 FFFFFE63			call ShowDCards ; show dealer cards using procedure
- 0000031B  E8 FFFFFF6A			call Score ; determine if player or dealer won
+ 0000066F			PromptPlayAgain PROC ; ask player to play again
+ 0000066F  E8 00000000 E		call Crlf
+ 00000674  BA 00000478 R		mov edx, OFFSET playAgainMessage ; prompt player if they want to play again
+ 00000679  E8 00000000 E		call WriteString
+ 0000067E  E8 00000000 E		call ReadChar
+ 00000683  E8 00000000 E		call Crlf
+ 00000688  3C 79			cmp al, 'y'
+ 0000068A  74 18			je yes ; if yes jump to play again
+ 0000068C  3C 59			cmp al, 'Y'
+ 0000068E  74 14			je yes
+ 00000690  3C 6E			cmp al, 'n'
+ 00000692  74 16			je no ; if no jump to quit
+ 00000694  3C 4E			cmp al, 'N'
+ 00000696  74 12			je no
+ 00000698  BA 0000048C R		mov edx, OFFSET invalidMessage
+ 0000069D  E8 00000000 E		call WriteString
+ 000006A2  EB CB			jmp PromptPlayAgain
+ 000006A4			yes: ; reset vars and start again
+ 000006A4  B8 00000001			mov eax,1
+ 000006A9  C3				ret
+ 000006AA			no: ; player chooses to quit, exit program
+ 000006AA  B8 00000000			mov eax,0
+ 000006AF  C3			    ret
+ 000006B0			PromptPlayAgain ENDP
+
+ 000006B0			main PROC
+ 000006B0  E8 00000000 E		call Randomize ; irvine32 procedure to generate a new seed for a random number generator
+					; the invoke above I taught myself with the internet outside of class
+					; the program wouldnt print the correct ASCII characters, so this sets the modes
+
+ 000006B5			Start:
+ 000006B5  83 3D 0000030D R		cmp playerWallet,0 ; ensure player has money
+	   00
+ 000006BC  7F 1B			jg HasMoney
+ 000006BE  E8 00000000 E		call Clrscr
+ 000006C3  BA 00000367 R		mov edx,OFFSET outOfMoney
+ 000006C8  E8 00000000 E		call WriteString
+ 000006CD  E8 00000000 E		call Crlf
+ 000006D2  E8 00000000 E		call ReadKey
+ 000006D7  EB 66			jmp quit
+
+ 000006D9			HasMoney:
+ 000006D9  E8 00000000 E		call Clrscr
+ 000006DE  E8 FFFFF950			call PlayerBet
+ 000006E3  E8 FFFFFA74			call DrawP ; get first 2 player cards
+ 000006E8  E8 FFFFFA6F			call DrawP
+ 000006ED  E8 FFFFFAD0			call DrawD ; get first 2 dealer cards
+ 000006F2  E8 FFFFFACB			call DrawD
+
+					; check for blackjack
+ 000006F7  E8 FFFFFE4D			call CheckBJ
+ 000006FC  83 F8 01			cmp eax,1
+ 000006FF  74 28			je Next
+
+ 00000701  E8 FFFFFCCD			call PTurn ; player turn
+ 00000706  83 F8 01			cmp eax,1
+ 00000709  74 1E			je Next
+ 0000070B  E8 FFFFFDD8			call DTurn ; dealer turn
+ 00000710  83 F8 01			cmp eax,1
+ 00000713  74 14			je Next
+ 00000715  E8 00000000 E		call Clrscr ; clear screen
+ 0000071A  E8 FFFFFBD5			call ShowPCards
+ 0000071F  E8 FFFFFC6A			call ShowDCards ; show dealer cards using procedure
+ 00000724  E8 FFFFFECC			call Score ; determine if player or dealer won
+
+ 00000729			Next: ; after game, prompt player to play again
+ 00000729  E8 FFFFFF41			call PromptPlayAgain
+ 0000072E  83 F8 01			cmp eax,1
+ 00000731  74 02			je PlayAgain
+ 00000733  EB 0A			jmp quit
+ 00000735			PlayAgain: ; player chooses to play again
+ 00000735  E8 FFFFF99C			call ResetRound
+ 0000073A  E9 FFFFFF76			jmp Start
+ 0000073F			quit: ; player chooses to quit
+ 0000073F  E8 00000000 E		call Clrscr
+ 00000744  BA 000004A3 R		mov edx, OFFSET goodbye
+ 00000749  E8 00000000 E		call WriteString
+ 0000074E  E8 00000000 E		call Crlf
 					INVOKE ExitProcess,0
- 00000320  6A 00	   *	    push   +000000000h
- 00000322  E8 00000000 E   *	    call   ExitProcess
- 00000327			main ENDP
+ 00000753  6A 00	   *	    push   +000000000h
+ 00000755  E8 00000000 E   *	    call   ExitProcess
+ 0000075A			main ENDP
 				END main
-Microsoft (R) Macro Assembler Version 14.44.35223.0	    04/01/26 17:13:20
+Microsoft (R) Macro Assembler Version 14.44.35223.0	    04/27/26 20:17:14
 blackjack.asm						     Symbols 2 - 1
 
 
@@ -482,31 +922,36 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 0000033D Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000327 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 000004AC Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 0000075A Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
 
                 N a m e                 Type     Value    Attr
 
+BlackjackPay . . . . . . . . . .	P Near	 0000009C _TEXT	Length= 0000001A Public STDCALL
+CheckBJ  . . . . . . . . . . . .	P Near	 00000549 _TEXT	Length= 000000AC Public STDCALL
+  NoDealerBJ . . . . . . . . . .	L Near	 000005AD _TEXT	
+  NoPlayerBJ . . . . . . . . . .	L Near	 000005EF _TEXT	
 CloseFile  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 CloseHandle  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Clrscr . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 CreateFileA  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 CreateOutputFile . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Crlf . . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-DTurn  . . . . . . . . . . . . .	P Near	 00000250 _TEXT	Length= 0000003A Public STDCALL
-  L1 . . . . . . . . . . . . . .	L Near	 00000250 _TEXT	
-  stand  . . . . . . . . . . . .	L Near	 00000260 _TEXT	
-  bust . . . . . . . . . . . . .	L Near	 0000026A _TEXT	
+DTurn  . . . . . . . . . . . . .	P Near	 000004E8 _TEXT	Length= 00000061 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 000004E8 _TEXT	
+  stand  . . . . . . . . . . . .	L Near	 000004F8 _TEXT	
+  bust . . . . . . . . . . . . .	L Near	 00000507 _TEXT	
 Delay  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-DrawD  . . . . . . . . . . . . .	P Near	 00000086 _TEXT	Length= 00000058 Public STDCALL
-  noAce  . . . . . . . . . . . .	L Near	 000000A1 _TEXT	
-  L1 . . . . . . . . . . . . . .	L Near	 000000CA _TEXT	
-DrawP  . . . . . . . . . . . . .	P Near	 0000002E _TEXT	Length= 00000058 Public STDCALL
-  noAce  . . . . . . . . . . . .	L Near	 00000049 _TEXT	
-  L1 . . . . . . . . . . . . . .	L Near	 00000072 _TEXT	
+DrawD  . . . . . . . . . . . . .	P Near	 000001C2 _TEXT	Length= 00000066 Public STDCALL
+  noAce  . . . . . . . . . . . .	L Near	 000001DD _TEXT	
+  L1 . . . . . . . . . . . . . .	L Near	 00000206 _TEXT	
+DrawP  . . . . . . . . . . . . .	P Near	 0000015C _TEXT	Length= 00000066 Public STDCALL
+  noAce  . . . . . . . . . . . .	L Near	 00000177 _TEXT	
+  L1 . . . . . . . . . . . . . .	L Near	 000001A0 _TEXT	
+DrawSuit . . . . . . . . . . . .	P Near	 0000000E _TEXT	Length= 0000000B Public STDCALL
 Draw . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000000E Public STDCALL
 DumpMem  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 DumpRegs . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -542,18 +987,39 @@ HeapFree . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 HeapSize . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 IsDigit  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 LocalFree  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+LoseBet  . . . . . . . . . . . .	P Near	 0000008B _TEXT	Length= 00000011 Public STDCALL
 MessageBoxA  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 MsgBoxAsk  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 MsgBox . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 OpenInputFile  . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-PTurn  . . . . . . . . . . . . .	P Near	 000001DB _TEXT	Length= 00000075 Public STDCALL
-  L1 . . . . . . . . . . . . . .	L Near	 000001DB _TEXT	
-  hit  . . . . . . . . . . . . .	L Near	 0000021A _TEXT	
-  stand  . . . . . . . . . . . .	L Near	 0000022A _TEXT	
-  bust . . . . . . . . . . . . .	L Near	 0000022B _TEXT	
+PTurn  . . . . . . . . . . . . .	P Near	 000003D3 _TEXT	Length= 00000115 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 000003D3 _TEXT	
+  CantDouble . . . . . . . . . .	L Near	 0000040F _TEXT	
+  Prompt . . . . . . . . . . . .	L Near	 00000414 _TEXT	
+  hit  . . . . . . . . . . . . .	L Near	 00000438 _TEXT	
+  stand  . . . . . . . . . . . .	L Near	 00000448 _TEXT	
+  tryDD  . . . . . . . . . . . .	L Near	 0000044E _TEXT	
+  noDD . . . . . . . . . . . . .	L Near	 00000497 _TEXT	
+  bust . . . . . . . . . . . . .	L Near	 000004AB _TEXT	
 ParseDecimal32 . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ParseInteger32 . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 PeekConsoleInputA  . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+PlayerBet  . . . . . . . . . . .	P Near	 00000033 _TEXT	Length= 00000047 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 00000033 _TEXT	
+  invalid  . . . . . . . . . . .	L Near	 0000005F _TEXT	
+PrintCard  . . . . . . . . . . .	P Near	 00000284 _TEXT	Length= 00000041 Public STDCALL
+  Ace  . . . . . . . . . . . . .	L Near	 0000029F _TEXT	
+  Suit . . . . . . . . . . . . .	L Near	 000002A9 _TEXT	
+PrintSuit  . . . . . . . . . . .	P Near	 00000228 _TEXT	Length= 0000005C Public STDCALL
+  RedSuit  . . . . . . . . . . .	L Near	 0000023C _TEXT	
+  Print  . . . . . . . . . . . .	L Near	 00000246 _TEXT	
+  Spade  . . . . . . . . . . . .	L Near	 0000025C _TEXT	
+  Club . . . . . . . . . . . . .	L Near	 00000263 _TEXT	
+  Heart  . . . . . . . . . . . .	L Near	 0000026A _TEXT	
+  Write  . . . . . . . . . . . .	L Near	 00000271 _TEXT	
+PromptPlayAgain  . . . . . . . .	P Near	 0000066F _TEXT	Length= 00000041 Public STDCALL
+  yes  . . . . . . . . . . . . .	L Near	 000006A4 _TEXT	
+  no . . . . . . . . . . . . . .	L Near	 000006AA _TEXT	
 Random32 . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 RandomRange  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Randomize  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -569,10 +1035,11 @@ ReadInt  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 ReadKeyFlush . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ReadKey  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ReadString . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-Score  . . . . . . . . . . . . .	P Near	 0000028A _TEXT	Length= 00000064 Public STDCALL
-  win  . . . . . . . . . . . . .	L Near	 0000029D _TEXT	
-  lose . . . . . . . . . . . . .	L Near	 000002B8 _TEXT	
-  tie  . . . . . . . . . . . . .	L Near	 000002D3 _TEXT	
+ResetRound . . . . . . . . . . .	P Near	 000000D6 _TEXT	Length= 00000086 Public STDCALL
+Score  . . . . . . . . . . . . .	P Near	 000005F5 _TEXT	Length= 0000007A Public STDCALL
+  win  . . . . . . . . . . . . .	L Near	 00000608 _TEXT	
+  lose . . . . . . . . . . . . .	L Near	 0000062C _TEXT	
+  tie  . . . . . . . . . . . . .	L Near	 00000650 _TEXT	
 SetConsoleCursorInfo . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetConsoleCursorPosition . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetConsoleMode . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -583,18 +1050,14 @@ SetConsoleWindowInfo . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 SetFilePointer . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetLocalTime . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetTextColor . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-ShowDCards . . . . . . . . . . .	P Near	 0000017E _TEXT	Length= 0000005D Public STDCALL
-  L1 . . . . . . . . . . . . . .	L Near	 00000198 _TEXT	
-  ace  . . . . . . . . . . . . .	L Near	 000001B1 _TEXT	
-  postPrint  . . . . . . . . . .	L Near	 000001BB _TEXT	
+ShowDCards . . . . . . . . . . .	P Near	 0000038E _TEXT	Length= 00000045 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 000003A8 _TEXT	
 ShowFPUStack . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-ShowHiddenCard . . . . . . . . .	P Near	 000000DE _TEXT	Length= 00000048 Public STDCALL
-  ace  . . . . . . . . . . . . .	L Near	 00000104 _TEXT	
-  postPrint  . . . . . . . . . .	L Near	 0000010E _TEXT	
-ShowPCards . . . . . . . . . . .	P Near	 00000126 _TEXT	Length= 00000058 Public STDCALL
-  L1 . . . . . . . . . . . . . .	L Near	 00000140 _TEXT	
-  ace  . . . . . . . . . . . . .	L Near	 00000159 _TEXT	
-  postPrint  . . . . . . . . . .	L Near	 00000163 _TEXT	
+ShowHiddenCard . . . . . . . . .	P Near	 000002C5 _TEXT	Length= 0000002F Public STDCALL
+ShowPCards . . . . . . . . . . .	P Near	 000002F4 _TEXT	Length= 0000009A Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 0000030E _TEXT	
+  NoDoubleDown . . . . . . . . .	L Near	 00000388 _TEXT	
+ShowWallet . . . . . . . . . . .	P Near	 00000019 _TEXT	Length= 0000001A Public STDCALL
 Sleep  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 StrLength  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Str_compare  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -603,11 +1066,12 @@ Str_length . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 Str_trim . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Str_ucase  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SystemTimeToFileTime . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-Value  . . . . . . . . . . . . .	P Near	 0000000E _TEXT	Length= 00000020 Public STDCALL
-  standard . . . . . . . . . . .	L Near	 0000001F _TEXT	
-  faceCard . . . . . . . . . . .	L Near	 00000022 _TEXT	
-  ace  . . . . . . . . . . . . .	L Near	 00000028 _TEXT	
+Value  . . . . . . . . . . . . .	P Near	 000000B6 _TEXT	Length= 00000020 Public STDCALL
+  standard . . . . . . . . . . .	L Near	 000000C7 _TEXT	
+  faceCard . . . . . . . . . . .	L Near	 000000CA _TEXT	
+  ace  . . . . . . . . . . . . .	L Near	 000000D0 _TEXT	
 WaitMsg  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+WinBet . . . . . . . . . . . . .	P Near	 0000007A _TEXT	Length= 00000011 Public STDCALL
 WriteBinB  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteBin . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteChar  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -625,7 +1089,12 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 000002EE _TEXT	Length= 00000039 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 000006B0 _TEXT	Length= 000000AA Public STDCALL
+  Start  . . . . . . . . . . . .	L Near	 000006B5 _TEXT	
+  HasMoney . . . . . . . . . . .	L Near	 000006D9 _TEXT	
+  Next . . . . . . . . . . . . .	L Near	 00000729 _TEXT	
+  PlayAgain  . . . . . . . . . .	L Near	 00000735 _TEXT	
+  quit . . . . . . . . . . . . .	L Near	 0000073F _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -844,39 +1313,60 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
-aceMSG . . . . . . . . . . . . .	Byte	 000002E6 _DATA	
+aceMSG . . . . . . . . . . . . .	Byte	 000003D4 _DATA	
+betPrint . . . . . . . . . . . .	Byte	 00000324 _DATA	
+bet  . . . . . . . . . . . . . .	DWord	 00000311 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
 cardArray  . . . . . . . . . . .	DWord	 00000028 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
 dCardArray . . . . . . . . . . .	DWord	 00000014 _DATA	
-dealerAce  . . . . . . . . . . .	DWord	 000002E2 _DATA	
-dealerCount  . . . . . . . . . .	DWord	 000002D4 _DATA	
-dealerScore  . . . . . . . . . .	DWord	 000002D8 _DATA	
-dealerTurnMessage  . . . . . . .	Byte	 0000030A _DATA	
+dSuitArray . . . . . . . . . . .	DWord	 000002E0 _DATA	
+dealerAce  . . . . . . . . . . .	DWord	 000003D0 _DATA	
+dealerCount  . . . . . . . . . .	DWord	 00000387 _DATA	
+dealerScore  . . . . . . . . . .	DWord	 0000038B _DATA	
+dealerTurnMessage  . . . . . . .	Byte	 00000445 _DATA	
+doubleDown . . . . . . . . . . .	DWord	 000003D6 _DATA	
+doubleMessage  . . . . . . . . .	Byte	 000003DA _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
+goodbye  . . . . . . . . . . . .	Byte	 000004A3 _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
-hidden . . . . . . . . . . . . .	Byte	 000002DC _DATA	
+hidden . . . . . . . . . . . . .	Byte	 000003CA _DATA	
+invalidBet . . . . . . . . . . .	Byte	 00000330 _DATA	
+invalidMessage . . . . . . . . .	Byte	 0000048C _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
 lightGreen . . . . . . . . . . .	Number	 0000000Ah   
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
-loseMessage  . . . . . . . . . .	Byte	 00000322 _DATA	
+loseMessage  . . . . . . . . . .	Byte	 0000045D _DATA	
 magenta  . . . . . . . . . . . .	Number	 00000005h   
+noDouble . . . . . . . . . . . .	Byte	 000003EA _DATA	
+outOfMoney . . . . . . . . . . .	Byte	 00000367 _DATA	
 pCardArray . . . . . . . . . . .	DWord	 00000000 _DATA	
-playerAce  . . . . . . . . . . .	DWord	 000002DE _DATA	
-playerActionMSG  . . . . . . . .	Byte	 000002F4 _DATA	
-playerCount  . . . . . . . . . .	DWord	 000002CC _DATA	
-playerScore  . . . . . . . . . .	DWord	 000002D0 _DATA	
-playerTurnMessage  . . . . . . .	Byte	 000002E8 _DATA	
-pushMessage  . . . . . . . . . .	Byte	 00000331 _DATA	
+pSuitArray . . . . . . . . . . .	DWord	 000002CC _DATA	
+playAgainMessage . . . . . . . .	Byte	 00000478 _DATA	
+playerAce  . . . . . . . . . . .	DWord	 000003CC _DATA	
+playerActionDouble . . . . . . .	Byte	 0000041F _DATA	
+playerActionMSG  . . . . . . . .	Byte	 00000409 _DATA	
+playerBJ . . . . . . . . . . . .	Byte	 0000038F _DATA	
+playerCount  . . . . . . . . . .	DWord	 0000037F _DATA	
+playerScore  . . . . . . . . . .	DWord	 00000383 _DATA	
+playerTurnMessage  . . . . . . .	Byte	 000003FD _DATA	
+playerWallet . . . . . . . . . .	DWord	 0000030D _DATA	
+pushBJ . . . . . . . . . . . . .	Byte	 000003A3 _DATA	
+pushMessage  . . . . . . . . . .	Byte	 0000046C _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
+suitClub . . . . . . . . . . . .	Byte	 000002FA _DATA	
+suitDiamond  . . . . . . . . . .	Byte	 00000305 _DATA	
+suitHeart  . . . . . . . . . . .	Byte	 000002FF _DATA	
+suitSpade  . . . . . . . . . . .	Byte	 000002F4 _DATA	
+wallet . . . . . . . . . . . . .	Byte	 00000315 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
-winMessage . . . . . . . . . . .	Byte	 00000319 _DATA	
+winMessage . . . . . . . . . . .	Byte	 00000454 _DATA	
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
 
