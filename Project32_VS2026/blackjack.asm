@@ -1,5 +1,4 @@
 INCLUDE irvine32.inc
-SetConsoleOutputCP PROTO STDCALL, codePage:DWORD
 
 .data
 ; cards for player and dealer
@@ -12,6 +11,12 @@ cardArray DWORD 13 DUP (1,2,3,4,5,6,7,8,9,10,10,10,10) ; card values
 ; suits for player and dealer
 pSuitArray DWORD 0,0,0,0,0
 dSuitArray DWORD 0,0,0,0,0
+
+; suit words since ASCII characters dont work
+suitSpade   BYTE "Spade",0
+suitClub    BYTE "Club",0
+suitHeart   BYTE "Heart",0
+suitDiamond BYTE "Diamond",0
 
 playerWallet DWORD 500 ; start with $500
 bet DWORD 0 ; this turns bet
@@ -251,6 +256,7 @@ PrintSuit PROC
 	; 3=diamonds
 	push eax ; must preserve eax because card value will be in eax
 	push ecx
+	push ebx
 	cmp ebx,2
 	jge RedSuit ; 2-3 are red suits, 0-1 are black (printed as white) suits
 	mov eax,(black*16)+white
@@ -260,27 +266,29 @@ RedSuit:
 	mov eax,(black*16)+red
 	call SetTextColor
 Print:
+	;branching for suits to load suit into ebx
 	cmp ebx,0
 	je Spade
 	cmp ebx,1
 	je Club
 	cmp ebx,2
 	je Heart
-	mov al,4 ; ASCII for diamond
+	mov edx,OFFSET suitDiamond
 	jmp Write
 Spade:
-	mov al,6 ; ASCII for spades
+	mov edx,OFFSET suitSpade
 	jmp Write
 Club:
-	mov al,5 ; ASCII for clubs
+	mov edx,OFFSET suitClub
 	jmp Write
 Heart:
-	mov al,3 ; ASCII for hearts
+	mov edx,OFFSET suitHeart
 	jmp Write
 Write:
-	call WriteChar
-	mov eax,white ; reset text color
+	call WriteString
+	mov eax,(black*16)+white ; reset text color
 	call SetTextColor
+	pop ebx
 	pop ecx
 	pop eax
 	ret
@@ -609,11 +617,9 @@ no: ; player chooses to quit, exit program
 PromptPlayAgain ENDP
 
 main PROC
-	INVOKE SetConsoleOutputCP,437
 	call Randomize ; irvine32 procedure to generate a new seed for a random number generator
 	; the invoke above I taught myself with the internet outside of class
 	; the program wouldnt print the correct ASCII characters, so this sets the modes
-
 
 Start:
 	cmp playerWallet,0 ; ensure player has money
